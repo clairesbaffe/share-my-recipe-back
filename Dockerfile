@@ -19,7 +19,7 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-COPY --from=build /app/build/libs/ktor-sample-all.jar .
+COPY --from=build /app/build/libs/ktor-challenge-web-all.jar .
 
 EXPOSE 8080
 

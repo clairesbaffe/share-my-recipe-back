@@ -60,4 +60,10 @@ dependencies {
 
     implementation("io.insert-koin:koin-annotations:$koin_ksp_version")
     ksp("io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
+
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+    implementation("org.mindrot:jbcrypt:0.4")
+
+    implementation("com.auth0:java-jwt:4.4.0")
 }
