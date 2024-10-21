@@ -12,4 +12,12 @@ object UserMapper {
             roles = entity.roles.split(",")
         )
     }
+
+    fun toEntity(user: User): UserEntity {
+        return UserEntity.new {
+            username = user.username
+            passwordHash = user.passwordHash
+            roles = user.roles.joinToString(",")
+        }
+    }
 }

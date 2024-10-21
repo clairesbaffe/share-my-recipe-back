@@ -22,7 +22,7 @@ class UserRegistrationService(
             id = 0,
             username = username,
             passwordHash = passwordHash,
-            roles = listOf("ROLE_USER")
+            roles = listOf("USER")
         )
         return userRepository.save(user)
     }

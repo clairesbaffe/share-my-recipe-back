@@ -26,11 +26,7 @@ class UserRepository : UserRepositoryPort {
     override suspend fun save(user: User): User {
         return withContext(Dispatchers.IO) {
             transaction {
-                val entity = UserEntity.new {
-                    username = user.username
-                    passwordHash = user.passwordHash
-                    roles = user.roles.joinToString(",")
-                }
+                val entity = UserMapper.toEntity(user)
                 UserMapper.toDomain(entity)
             }
         }

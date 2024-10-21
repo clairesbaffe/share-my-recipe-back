@@ -39,6 +39,7 @@ fun generateToken(user: User, issuer: String, secret: String, audience: String):
     return JWT.create()
         .withAudience(audience)
         .withIssuer(issuer)
+        .withClaim("userId", user.id.toString())
         .withClaim("username", user.username)
         .withArrayClaim("roles", user.roles.toTypedArray())
         .withExpiresAt(Date(System.currentTimeMillis() + 600_000))
