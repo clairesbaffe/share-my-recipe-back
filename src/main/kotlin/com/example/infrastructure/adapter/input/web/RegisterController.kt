@@ -9,7 +9,6 @@ import io.ktor.server.request.*
 import org.koin.ktor.ext.inject
 
 data class RegisterRequest(val username: String, val password: String)
-data class RegisterResponse(val message: String)
 
 fun Route.registerController() {
     val userRegistrationUseCase: UserRegistrationUseCasePort by inject()
@@ -18,7 +17,7 @@ fun Route.registerController() {
         val registerRequest = call.receive<RegisterRequest>()
         try {
             userRegistrationUseCase.registerUser(registerRequest.username, registerRequest.password)
-            call.respond(HttpStatusCode.Created, RegisterResponse("Inscription réussie"))
+            call.respond(HttpStatusCode.Created, mapOf("message" to "Inscription réussie"))
         } catch (e: IllegalArgumentException) {
             call.respond(HttpStatusCode.Conflict, e.message ?: "Erreur lors de l'inscription")
         }

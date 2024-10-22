@@ -25,9 +25,9 @@ fun Route.loginController() {
             val userSession = UserSession(userId = user.id, username = user.username, expiryTime = expiryTime)
             call.sessions.set(userSession)
 
-            call.respond(HttpStatusCode.OK, "Connexion réussie")
+            call.respond(HttpStatusCode.OK, mapOf("message" to "Connexion réussie"))
         } else {
-            call.respond(HttpStatusCode.Unauthorized, "Identifiants invalides")
+            call.respond(HttpStatusCode.Unauthorized, mapOf("message" to "Identifiants invalides"))
         }
     }
 }

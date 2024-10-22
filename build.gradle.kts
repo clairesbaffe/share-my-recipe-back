@@ -38,6 +38,7 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
     implementation("io.ktor:ktor-server-host-common:$ktor_version")
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.github.microutils:kotlin-logging-jvm:$kotlin_logging_version")
@@ -67,4 +68,5 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.11.0")
     implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.0")
+
 }
