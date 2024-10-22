@@ -1,9 +1,6 @@
 package com.example.infrastructure.config
 
-import com.example.infrastructure.adapter.input.web.libraryController
-import com.example.infrastructure.adapter.input.web.loginController
-import com.example.infrastructure.adapter.input.web.logoutController
-import com.example.infrastructure.adapter.input.web.registerController
+import com.example.infrastructure.adapter.input.web.*
 import com.example.infrastructure.middleware.withRole
 import com.example.infrastructure.middleware.withSessionRenewal
 import io.ktor.server.application.*
@@ -20,6 +17,11 @@ fun Application.configureRouting() {
                 route("/library") {
                     withRole("USER") {
                         libraryController()
+                    }
+                }
+                route("/recipies") {
+                    withRole("USER") {
+                        recipeController()
                     }
                 }
 

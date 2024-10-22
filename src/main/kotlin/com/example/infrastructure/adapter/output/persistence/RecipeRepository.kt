@@ -7,6 +7,7 @@ import com.example.domain.model.Recipe
 import com.example.infrastructure.adapter.output.entity.BookEntity
 import com.example.infrastructure.adapter.output.entity.RecipeEntity
 import com.example.infrastructure.mapper.BookMapper
+import com.example.infrastructure.mapper.RecipeMapper
 import com.example.infrastructure.mapper.UserMapper
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlinx.coroutines.Dispatchers
@@ -18,24 +19,24 @@ class RecipeRepository : RecipeLoaderPort {
     override suspend fun loadRecipe(recipeId: Long): Recipe? {
         return withContext(Dispatchers.IO) {
             transaction {
-                RecipeEntity.findById(recipeId)?.let { BookMapper.toDomain(it) }
+                RecipeEntity.findById(recipeId)?.let { RecipeMapper.toDomain(it) }
             }
         }
     }
 
-    override suspend fun saveBook(book: Book): Book {
+    override suspend fun saveRecipe(recipe: Recipe): Recipe {
         return withContext(Dispatchers.IO) {
             transaction {
-                val entity = BookMapper.toEntity(book)
-                BookMapper.toDomain(entity)
+                val entity = RecipeMapper.toEntity(recipe)
+                RecipeMapper.toDomain(entity)
             }
         }
     }
 
-    override suspend fun findAllBooks(): List<Book> {
+    override suspend fun findAllRecipe(): List<Recipe> {
         return withContext(Dispatchers.IO) {
             transaction {
-                BookEntity.all().map { BookMapper.toDomain(it) }
+                RecipeEntity.all().map { RecipeMapper.toDomain(it) }
             }
         }
     }

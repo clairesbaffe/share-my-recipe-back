@@ -1,9 +1,9 @@
-package com.example.domain.model
+package com.example.infrastructure.adapter.input.web.dto
 
 import java.time.LocalDate
 import java.util.*
 
-data class Recipe(
+data class RecipeResponseDTO (
     val id: Long,
     val title: String,
     val image: String,

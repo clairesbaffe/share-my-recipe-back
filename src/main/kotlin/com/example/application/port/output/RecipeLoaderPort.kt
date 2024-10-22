@@ -1,6 +1,5 @@
 package com.example.application.port.output
 
-import com.example.domain.model.Book
 import com.example.domain.model.Recipe
 
 interface RecipeLoaderPort {

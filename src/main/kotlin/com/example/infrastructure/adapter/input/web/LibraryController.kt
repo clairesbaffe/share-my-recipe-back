@@ -15,7 +15,7 @@ fun Route.libraryController() {
     data class BookRequest(val title: String, val author: String)
     data class BookResponse(val message: String)
 
-    route("") {
+    route("library") {
         get("/{id}") {
             val bookId = call.parameters["id"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID de livre invalide ou manquant")

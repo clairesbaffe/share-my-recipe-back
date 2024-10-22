@@ -2,7 +2,6 @@ package com.example.infrastructure.mapper
 
 import com.example.domain.model.Book
 import com.example.domain.model.Recipe
-import com.example.infrastructure.adapter.output.entity.BookEntity
 import com.example.infrastructure.adapter.output.entity.RecipeEntity
 
 object RecipeMapper {
@@ -12,6 +11,7 @@ object RecipeMapper {
             entity.title,
             entity.image,
             entity.description,
+            entity.recette,
             entity.preparationTime,
             entity.nbPersons,
             entity.difficulty,
@@ -27,6 +27,7 @@ object RecipeMapper {
             this.title = recipe.title
             this.image = recipe.image
             this.description = recipe.description
+            this.recette = recipe.recette
             this.preparationTime = recipe.preparationTime
             this.nbPersons = recipe.nbPersons
             this.difficulty = recipe.difficulty

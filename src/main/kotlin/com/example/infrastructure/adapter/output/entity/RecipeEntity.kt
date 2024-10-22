@@ -10,6 +10,7 @@ object RecipeTable : LongIdTable() {
     val title = varchar("title", 255)
     val image = text("image")
     val description = text("description")
+    val recette = text("recette")
     val preparationTime = float("preparation_time")
     val nbPersons = integer("nb_persons")
     val difficulty = float("difficulty")
@@ -25,6 +26,7 @@ class RecipeEntity(id: EntityID<Long>) : LongEntity(id) {
     var title by RecipeTable.title
     var image by RecipeTable.image
     var description by RecipeTable.description
+    var recette by RecipeTable.recette
     var preparationTime by RecipeTable.preparationTime
     var nbPersons by RecipeTable.nbPersons
     var difficulty by RecipeTable.difficulty
