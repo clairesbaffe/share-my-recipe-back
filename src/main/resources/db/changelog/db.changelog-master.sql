@@ -15,7 +15,8 @@ CREATE TABLE "user" (
                         id BIGSERIAL PRIMARY KEY,
                         username VARCHAR(255) NOT NULL UNIQUE,
                         password_hash VARCHAR(60) NOT NULL,
-                        roles VARCHAR(255) NOT NULL
+                        roles VARCHAR(255) NOT NULL,
+                        date DATE NOT NULL
 );
 
 -- changeset author:4
