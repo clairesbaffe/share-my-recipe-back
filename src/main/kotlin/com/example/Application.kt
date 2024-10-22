@@ -12,7 +12,9 @@ fun main() {
     val host = config.property("ktor.deployment.host").getString()
     val port = config.property("ktor.deployment.port").getString().toInt()
 
-    embeddedServer(Netty, host = host, port = port) {
+    embeddedServer(Netty, port = port, host = host, configure = {
+        requestReadTimeoutSeconds = 30
+    }) {
         module(config)
     }.start(wait = true)
 }

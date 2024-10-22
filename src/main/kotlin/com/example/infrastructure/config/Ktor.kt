@@ -4,10 +4,14 @@ import com.example.infrastructure.model.UserSession
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.sessions.*
 import org.koin.ktor.plugin.Koin
 import org.koin.ksp.generated.defaultModule
@@ -38,6 +42,23 @@ fun Application.configureKtor(config: ApplicationConfig) {
 
             transform(SessionTransportTransformerMessageAuthentication(secretKey.toByteArray()))
         }
+    }
+
+    install(CORS) {
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentType)
+
+        allowCredentials = true
+
+        anyHost()
+
+        maxAgeInSeconds = 3600
     }
 
     configureRouting()

@@ -19,7 +19,7 @@ fun Route.registerController() {
         val registerRequest = call.receive<RegisterRequest>()
         try {
             userRegistrationUseCase.registerUser(registerRequest.username, registerRequest.password, LocalDate.now())
-            call.respond(HttpStatusCode.Created, RegisterResponse("Inscription réussie"))
+            call.respond(HttpStatusCode.Created, mapOf("message" to "Inscription réussie"))
         } catch (e: IllegalArgumentException) {
             call.respond(HttpStatusCode.Conflict, e.message ?: "Erreur lors de l'inscription")
         }
