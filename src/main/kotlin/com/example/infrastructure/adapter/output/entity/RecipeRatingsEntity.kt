@@ -6,8 +6,8 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 
 object RecipeRatingsTable : LongIdTable() {
-    val userId = long("userId")
-    val recipeId = long("recipeId")
+    val userId = long("userid")
+    val recipeId = long("recipeid")
     val rating = float("rating")
 }
 

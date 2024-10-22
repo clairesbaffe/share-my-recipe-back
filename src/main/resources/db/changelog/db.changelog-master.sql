@@ -1,16 +1,6 @@
 -- liquibase formatted sql
 
 -- changeset author:1
-CREATE TABLE book (
-                      id BIGSERIAL PRIMARY KEY,
-                      title VARCHAR(255) NOT NULL,
-                      author VARCHAR(255) NOT NULL
-);
-
--- changeset author:2
-INSERT INTO book (title, author) VALUES ('Sample Book', 'John Doe');
-
--- changeset author:3
 CREATE TABLE "user" (
                         id BIGSERIAL PRIMARY KEY,
                         username VARCHAR(255) NOT NULL UNIQUE,
@@ -19,7 +9,7 @@ CREATE TABLE "user" (
                         date DATE NOT NULL
 );
 
--- changeset author:4
+-- changeset author:2
 CREATE TABLE recipe (
                         id BIGSERIAL PRIMARY KEY,
                         title VARCHAR(255) NOT NULL,
@@ -36,11 +26,12 @@ CREATE TABLE recipe (
                         CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES "user" (id)
 );
 
--- changeset author:5
+-- changeset author:3
 CREATE TABLE recipeRatings (
-                               userId int not null,
-                               recipeId int not null,
-                               rating float,
+                               id BIGSERIAL PRIMARY KEY,
+                               userId BIGINT NOT NULL,
+                               recipeId BIGINT NOT NULL,
+                               rating FLOAT,
                                CONSTRAINT fk_userId FOREIGN KEY (userId) REFERENCES "user" (id),
                                CONSTRAINT fk_recipeId FOREIGN KEY (recipeId) REFERENCES recipe (id)
 );

@@ -14,11 +14,6 @@ fun Application.configureRouting() {
             logoutController()
 
             withSessionRenewal {
-                route("/library") {
-                    withRole("USER") {
-                        libraryController()
-                    }
-                }
                 route("/recipes") {
                     withRole("USER") {
                         recipeController()
