@@ -3,6 +3,7 @@ package com.example.infrastructure.config
 import com.example.infrastructure.model.UserSession
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.config.*
@@ -21,6 +22,8 @@ fun Application.configureKtor(config: ApplicationConfig) {
             enable(SerializationFeature.INDENT_OUTPUT)
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             writerWithDefaultPrettyPrinter()
+            registerModule(JavaTimeModule())
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         }
     }
 

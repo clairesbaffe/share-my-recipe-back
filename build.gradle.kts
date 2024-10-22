@@ -66,4 +66,5 @@ dependencies {
     implementation("org.mindrot:jbcrypt:0.4")
 
     implementation("com.google.code.gson:gson:2.11.0")
+    implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.0")
 }

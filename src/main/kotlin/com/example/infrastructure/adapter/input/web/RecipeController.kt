@@ -70,8 +70,6 @@ fun Route.recipeController() {
     post("") {
         val recipeRequest = call.receive<RecipeRequest>()
         try {
-            val date = LocalDate.parse(recipeRequest.date)
-
             val recetteJson = gson.toJson(recipeRequest.recette)
 
             recipeUseCase.postRecipe(
@@ -85,7 +83,7 @@ fun Route.recipeController() {
                 tags = recipeRequest.tags,
                 ratings = recipeRequest.ratings,
                 authorId = recipeRequest.authorId,
-                date = date
+                date = LocalDate.now()
             )
             call.respond(HttpStatusCode.Created, mapOf("message" to "Recette créée avec succès"))
         } catch (e: Exception) {

@@ -11,7 +11,6 @@ data class RecipeRequest(
     val tags: List<String>,
     val ratings: Float,
     val authorId: Long,
-    val date: String
 )
 
 data class RecipeDetails(
