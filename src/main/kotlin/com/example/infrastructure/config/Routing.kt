@@ -12,6 +12,7 @@ fun Application.configureRouting() {
             registerController()
             loginController()
             logoutController()
+            meController()
 
             withSessionRenewal {
                 route("/library") {
@@ -19,6 +20,7 @@ fun Application.configureRouting() {
                         libraryController()
                     }
                 }
+
                 route("/recipes") {
                     withRole("USER") {
                         recipeController()

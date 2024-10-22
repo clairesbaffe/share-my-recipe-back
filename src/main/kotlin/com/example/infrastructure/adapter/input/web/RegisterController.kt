@@ -10,7 +10,6 @@ import org.koin.ktor.ext.inject
 import java.time.LocalDate
 
 data class RegisterRequest(val username: String, val password: String)
-data class RegisterResponse(val message: String)
 
 fun Route.registerController() {
     val userRegistrationUseCase: UserRegistrationUseCasePort by inject()
