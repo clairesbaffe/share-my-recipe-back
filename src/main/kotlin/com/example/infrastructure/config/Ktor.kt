@@ -1,15 +1,13 @@
 package com.example.infrastructure.config
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
+import com.example.infrastructure.model.UserSession
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.config.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.sessions.*
 import org.koin.ktor.plugin.Koin
 import org.koin.ksp.generated.defaultModule
 
@@ -26,32 +24,20 @@ fun Application.configureKtor(config: ApplicationConfig) {
         }
     }
 
-    install(Authentication) {
-        jwt("auth-jwt") {
-            val jwtAudience = config.property("ktor.jwt.audience").getString()
-            val jwtIssuer = config.property("ktor.jwt.issuer").getString()
-            val jwtRealm = config.property("ktor.jwt.realm").getString()
-            val jwtSecret = config.property("ktor.jwt.privateKey").getString()
+    val secretKey = config.property("ktor.sessions.secretKey").getString()
 
-            realm = jwtRealm
-            verifier(
-                JWT
-                    .require(Algorithm.HMAC256(jwtSecret))
-                    .withAudience(jwtAudience)
-                    .withIssuer(jwtIssuer)
-                    .build()
-            )
-            validate { credential ->
-                if (credential.payload.audience.contains(jwtAudience)) {
-                    JWTPrincipal(credential.payload)
-                } else {
-                    null
-                }
-            }
+    install(Sessions) {
+        cookie<UserSession>("USER_SESSION") {
+            cookie.path = "/"
+            cookie.httpOnly = true
+            cookie.secure = false
+            cookie.maxAgeInSeconds = 3600
+
+            transform(SessionTransportTransformerMessageAuthentication(secretKey.toByteArray()))
         }
     }
 
-    configureRouting(config)
+    configureRouting()
     configureExceptionHandling()
 
     Database.init(config)

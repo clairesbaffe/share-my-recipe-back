@@ -4,5 +4,6 @@ import com.example.domain.model.User
 
 interface UserRepositoryPort {
     suspend fun findByUsername(username: String): User?
+    suspend fun findById(userId: Long): User?
     suspend fun save(user: User): User
 }

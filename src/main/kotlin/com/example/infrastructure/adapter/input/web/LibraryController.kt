@@ -12,7 +12,7 @@ import org.koin.ktor.ext.inject
 fun Route.libraryController() {
     val bookUseCase: BookUseCasePort by inject()
 
-    route("/library") {
+    route("") {
         get("/{id}") {
             val bookId = call.parameters["id"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID de livre invalide ou manquant")

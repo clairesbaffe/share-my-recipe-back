@@ -31,4 +31,14 @@ class UserRepository : UserRepositoryPort {
             }
         }
     }
+
+    override suspend fun findById(userId: Long): User? {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                UserEntity.findById(userId)?.let {
+                    UserMapper.toDomain(it)
+                }
+            }
+        }
+    }
 }
