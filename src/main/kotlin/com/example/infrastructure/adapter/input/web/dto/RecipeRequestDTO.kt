@@ -20,4 +20,5 @@ data class RecipeDetails(
 
 data class RecipeRating(
     val rating: Float,
+    val userId: Long
 )

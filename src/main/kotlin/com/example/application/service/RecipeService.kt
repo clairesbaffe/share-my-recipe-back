@@ -52,4 +52,8 @@ class RecipeService(
     override suspend fun updateRecipeRating(id: Long, rating: Float): Recipe {
         return recipeLoaderPort.updateRecipeRating(id, rating)
     }
+
+    override suspend fun getRatingsForRecipe(id: Long): Float {
+        return recipeLoaderPort.getRatingsForRecipe(id)
+    }
 }

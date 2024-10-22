@@ -24,6 +24,11 @@ fun Application.configureRouting() {
                         recipeController()
                     }
                 }
+                route("/ratings") {
+                    withRole("USER") {
+                        recipeRatingsController()
+                    }
+                }
 
                 route("/admin") {
                     withRole("ADMIN") {

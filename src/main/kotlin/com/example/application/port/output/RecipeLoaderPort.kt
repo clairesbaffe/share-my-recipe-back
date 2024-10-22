@@ -7,4 +7,5 @@ interface RecipeLoaderPort {
     suspend fun saveRecipe(recipe: Recipe): Recipe
     suspend fun findAllRecipe(): List<Recipe>
     suspend fun updateRecipeRating(id: Long, rating: Float): Recipe
+    suspend fun getRatingsForRecipe(id: Long): Float
 }

@@ -1,5 +1,6 @@
 package com.example.infrastructure.adapter.input.web
 
+import com.example.application.port.input.RecipeRatingsUseCasePort
 import com.example.application.port.input.RecipeUseCasePort
 import com.example.infrastructure.adapter.input.web.dto.RecipeRequest
 import com.example.infrastructure.adapter.input.web.dto.RecipeResponseDTO
@@ -104,5 +105,18 @@ fun Route.recipeController() {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
         }
 
+    }
+
+    get("/{id}/ratings"){
+        try{
+            val recipeRequest = call.receive<RecipeRating>()
+            val recipeId = call.parameters["id"]?.toLongOrNull()
+                ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
+
+            val ratings = recipeUseCase.getRatingsForRecipe(recipeId)
+            call.respond(HttpStatusCode.OK, ratings)
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+        }
     }
 }

@@ -35,3 +35,12 @@ CREATE TABLE recipe (
                         date DATE NOT NULL,
                         CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES "user" (id)
 );
+
+-- changeset author:5
+CREATE TABLE recipeRatings (
+                               userId int not null,
+                               recipeId int not null,
+                               rating float,
+                               CONSTRAINT fk_userId FOREIGN KEY (userId) REFERENCES "user" (id),
+                               CONSTRAINT fk_recipeId FOREIGN KEY (recipeId) REFERENCES recipe (id)
+);

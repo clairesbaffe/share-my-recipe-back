@@ -39,9 +39,10 @@ object RecipeMapper {
             nbPersons = recipe.nbPersons
             difficulty = recipe.difficulty
             tags = tagsJson
-            ratings = recipe.ratings
+            ratings = 0f
             authorId = recipe.authorId
             date = recipe.date
         }
     }
+
 }
