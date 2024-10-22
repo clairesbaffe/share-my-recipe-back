@@ -12,7 +12,7 @@ data class Recipe(
     val nbPersons: Int,
     val difficulty: Float,
     val tags: List<String>,
-    val ratings: Float,
+    var ratings: Float,
     val authorId: Long,
     val date: LocalDate
 )

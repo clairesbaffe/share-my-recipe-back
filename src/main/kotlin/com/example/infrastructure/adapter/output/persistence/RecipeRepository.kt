@@ -35,4 +35,17 @@ class RecipeRepository : RecipeLoaderPort {
             }
         }
     }
+
+    override suspend fun updateRecipeRating(id: Long, rating: Float): Recipe {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val existingEntity = RecipeEntity.findById(id)
+                    ?: throw IllegalArgumentException("Recette non trouvée")
+
+                existingEntity.ratings = (existingEntity.ratings + rating) / 2
+
+                RecipeMapper.toDomain(existingEntity)
+            }
+        }
+    }
 }

@@ -4,6 +4,7 @@ import com.example.application.port.input.RecipeUseCasePort
 import com.example.infrastructure.adapter.input.web.dto.RecipeRequest
 import com.example.infrastructure.adapter.input.web.dto.RecipeResponseDTO
 import com.example.infrastructure.adapter.input.web.dto.RecipeDetails
+import com.example.infrastructure.adapter.input.web.dto.RecipeRating
 import com.example.infrastructure.exception.RecipeNotFound
 import com.google.gson.Gson
 import io.ktor.http.*
@@ -89,5 +90,19 @@ fun Route.recipeController() {
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
         }
+    }
+
+    patch ("/{id}/ratings"){
+        try{
+            val recipeRequest = call.receive<RecipeRating>()
+            val recipeId = call.parameters["id"]?.toLongOrNull()
+                ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
+
+            recipeUseCase.updateRecipeRating(recipeId, recipeRequest.rating)
+            call.respond(HttpStatusCode.Created, mapOf("message" to "Recette créée avec succès"))
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+        }
+
     }
 }

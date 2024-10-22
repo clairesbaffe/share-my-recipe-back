@@ -17,3 +17,7 @@ data class RecipeDetails(
     val ingredients: List<String>,
     val instructions: List<String>
 )
+
+data class RecipeRating(
+    val rating: Float,
+)

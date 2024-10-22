@@ -19,4 +19,5 @@ interface RecipeUseCasePort {
         date: LocalDate
     ): Recipe
     suspend fun findAllRecipe(): List<Recipe>
+    suspend fun updateRecipeRating(id: Long, rating: Float): Recipe
 }

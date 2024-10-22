@@ -48,4 +48,8 @@ class RecipeService(
     override suspend fun findAllRecipe(): List<Recipe> {
         return recipeLoaderPort.findAllRecipe()
     }
+
+    override suspend fun updateRecipeRating(id: Long, rating: Float): Recipe {
+        return recipeLoaderPort.updateRecipeRating(id, rating)
+    }
 }
