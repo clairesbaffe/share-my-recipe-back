@@ -9,7 +9,8 @@ object UserMapper {
             id = entity.id.value,
             username = entity.username,
             passwordHash = entity.passwordHash,
-            roles = entity.roles.split(",")
+            roles = entity.roles.split(","),
+            date = entity.date
         )
     }
 
@@ -18,6 +19,7 @@ object UserMapper {
             username = user.username
             passwordHash = user.passwordHash
             roles = user.roles.joinToString(",")
+            date = user.date
         }
     }
 }
