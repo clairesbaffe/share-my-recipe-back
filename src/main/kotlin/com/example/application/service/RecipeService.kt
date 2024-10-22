@@ -1,14 +1,10 @@
-package com.example.application.service
-
 import com.example.application.port.input.BookUseCasePort
 import com.example.application.port.output.BookLoaderPort
 import com.example.domain.model.Book
-import com.example.domain.model.User
 import org.koin.core.annotation.Single
-import org.mindrot.jbcrypt.BCrypt
 
 @Single
-class LibraryService(
+class RecipeService(
     private val bookLoaderPort: BookLoaderPort
 ) : BookUseCasePort {
     override suspend fun findBookById(bookId: Long): Book? {
