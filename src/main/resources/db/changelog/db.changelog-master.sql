@@ -17,3 +17,20 @@ CREATE TABLE "user" (
                         password_hash VARCHAR(60) NOT NULL,
                         roles VARCHAR(255) NOT NULL
 );
+
+-- changeset author:4
+CREATE TABLE recipe (
+                        id BIGSERIAL PRIMARY KEY,
+                        title VARCHAR(255) NOT NULL,
+                        image TEXT NOT NULL,
+                        description TEXT NOT NULL,
+                        recette TEXT NOT NULL,
+                        preparation_time FLOAT NOT NULL,
+                        nb_persons INT NOT NULL,
+                        difficulty FLOAT NOT NULL,
+                        tags TEXT NOT NULL,
+                        ratings FLOAT NOT NULL,
+                        author_id BIGINT NOT NULL,
+                        date DATE NOT NULL,
+                        CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES "user" (id)
+);

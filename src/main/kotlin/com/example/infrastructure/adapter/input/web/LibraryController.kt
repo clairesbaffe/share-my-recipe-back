@@ -15,7 +15,7 @@ fun Route.libraryController() {
     data class BookRequest(val title: String, val author: String)
     data class BookResponse(val message: String)
 
-    route("library") {
+    route("") {
         get("/{id}") {
             val bookId = call.parameters["id"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID de livre invalide ou manquant")
@@ -31,7 +31,7 @@ fun Route.libraryController() {
             call.respond(HttpStatusCode.OK, bookDto)
         }
     }
-    get("/libraries"){
+    get("/all"){
         val books = bookUseCase.findAllBooks()
         val booksDto = books.map { book ->
             BookResponseDTO(
@@ -42,7 +42,7 @@ fun Route.libraryController() {
         }
         call.respond(HttpStatusCode.OK, booksDto)
     }
-    post("/library"){
+    post(""){
         val bookRequest = call.receive<BookRequest>()
         try {
             bookUseCase.postBook(bookRequest.title, bookRequest.author)

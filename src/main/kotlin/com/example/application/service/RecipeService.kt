@@ -15,7 +15,19 @@ class RecipeService(
         return recipeLoaderPort.loadRecipe(recipeId)
     }
 
-    override suspend fun postRecipe(title: String, image: String, description: String, recette: String, preparationTime: Float, nbPersons: Int, difficulty: Float, tags: List<String>, ratings: Float, authorId: Long): Recipe {
+    override suspend fun postRecipe(
+        title: String,
+        image: String,
+        description: String,
+        recette: String,
+        preparationTime: Float,
+        nbPersons: Int,
+        difficulty: Float,
+        tags: List<String>,
+        ratings: Float,
+        authorId: Long,
+        date: LocalDate
+    ): Recipe {
         val recipe = Recipe(
             id = 0,
             title = title,
@@ -28,7 +40,7 @@ class RecipeService(
             tags = tags,
             ratings = ratings,
             authorId = authorId,
-            date = LocalDate.now()
+            date = date
         )
         return recipeLoaderPort.saveRecipe(recipe)
     }

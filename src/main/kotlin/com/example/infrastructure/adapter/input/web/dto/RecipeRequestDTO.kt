@@ -1,9 +1,6 @@
 package com.example.infrastructure.adapter.input.web.dto
 
-import java.time.LocalDate
-
-data class RecipeResponseDTO(
-    val id: Long,
+data class RecipeRequest(
     val title: String,
     val image: String,
     val description: String,
@@ -14,5 +11,10 @@ data class RecipeResponseDTO(
     val tags: List<String>,
     val ratings: Float,
     val authorId: Long,
-    val date: LocalDate
+    val date: String
+)
+
+data class RecipeDetails(
+    val ingredients: List<String>,
+    val instructions: List<String>
 )

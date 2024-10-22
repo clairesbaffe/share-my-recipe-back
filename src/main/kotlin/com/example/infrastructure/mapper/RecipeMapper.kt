@@ -1,41 +1,47 @@
 package com.example.infrastructure.mapper
 
-import com.example.domain.model.Book
 import com.example.domain.model.Recipe
 import com.example.infrastructure.adapter.output.entity.RecipeEntity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 object RecipeMapper {
+    private val gson = Gson()
+
     fun toDomain(entity: RecipeEntity): Recipe {
+        val tagsList: List<String> = gson.fromJson(entity.tags, object : TypeToken<List<String>>() {}.type)
+
         return Recipe(
-            entity.id.value,
-            entity.title,
-            entity.image,
-            entity.description,
-            entity.recette,
-            entity.preparationTime,
-            entity.nbPersons,
-            entity.difficulty,
-            entity.tags.split(","),
-            entity.ratings,
-            entity.authorId,
-            entity.date
+            id = entity.id.value,
+            title = entity.title,
+            image = entity.image,
+            description = entity.description,
+            recette = entity.recette,
+            preparationTime = entity.preparationTime,
+            nbPersons = entity.nbPersons,
+            difficulty = entity.difficulty,
+            tags = tagsList,
+            ratings = entity.ratings,
+            authorId = entity.authorId,
+            date = entity.date
         )
     }
 
     fun toEntity(recipe: Recipe): RecipeEntity {
-        return RecipeEntity.new {
-            this.title = recipe.title
-            this.image = recipe.image
-            this.description = recipe.description
-            this.recette = recipe.recette
-            this.preparationTime = recipe.preparationTime
-            this.nbPersons = recipe.nbPersons
-            this.difficulty = recipe.difficulty
-            this.tags = recipe.tags.joinToString(",")  // Convert List<String> to a comma-separated String
-            this.ratings = recipe.ratings
-            this.authorId = recipe.authorId
-            this.date = recipe.date
-        }
+        val tagsJson: String = gson.toJson(recipe.tags)
 
+        return RecipeEntity.new {
+            title = recipe.title
+            image = recipe.image
+            description = recipe.description
+            recette = recipe.recette
+            preparationTime = recipe.preparationTime
+            nbPersons = recipe.nbPersons
+            difficulty = recipe.difficulty
+            tags = tagsJson
+            ratings = recipe.ratings
+            authorId = recipe.authorId
+            date = recipe.date
+        }
     }
 }

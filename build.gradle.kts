@@ -65,5 +65,5 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("org.mindrot:jbcrypt:0.4")
 
-    implementation("com.auth0:java-jwt:4.4.0")
+    implementation("com.google.code.gson:gson:2.11.0")
 }
