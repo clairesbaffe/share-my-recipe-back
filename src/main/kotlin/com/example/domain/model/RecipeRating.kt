@@ -1,7 +1,8 @@
 package com.example.domain.model
 
 data class RecipeRating(
-    val userId: Long,
-    val recipeId: Long,
+    val id: Long,
+    val userid: Long,
+    val recipeid: Long,
     val rating: Float,
 )

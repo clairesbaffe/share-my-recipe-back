@@ -39,43 +39,7 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
-    override suspend fun updateRecipeRating(id: Long, rating: Float): Recipe {
-        return withContext(Dispatchers.IO) {
-            transaction {
-                val existingEntity = RecipeEntity.findById(id)
-                    ?: throw IllegalArgumentException("Recette non trouvée")
 
-//                var rate = (existingEntity.ratings + rating) / 2
-//                rate = if (rate > 5) 5.0f else rate
-                existingEntity.ratings = rating
-
-                RecipeMapper.toDomain(existingEntity)
-            }
-        }
-    }
-
-    override suspend fun getRatingsForRecipe(id: Long): Float {
-//        return withContext(Dispatchers.IO) {
-//            transaction {
-//                val existingRatings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq id }.toList()
-//
-//                if (existingRatings.isEmpty()) {
-//                    throw IllegalArgumentException("Aucune évaluation trouvée pour cette recette")
-//                }
-//
-//                var overall = 0f
-//                for (rating in existingRatings) {
-//                    overall += rating.ratings
-//                }
-//
-//                val average = overall / existingRatings.size
-//
-//                return@transaction average
-//            }
-//        }
-        TODO("Not yet implemented")
-
-    }
 
 
 }

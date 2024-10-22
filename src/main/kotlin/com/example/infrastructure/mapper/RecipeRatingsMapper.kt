@@ -12,16 +12,17 @@ object RecipeRatingsMapper {
 
     fun toDomain(entity: RecipeRatingsEntity): RecipeRating {
         return RecipeRating(
-            userId = entity.userId,
-            recipeId = entity.recipeId,
+            id = entity.id.value,
+            userid = entity.userId,
+            recipeid = entity.recipeId,
             rating = entity.rating,
         )
     }
 
     fun toEntity(recipeRating: RecipeRating): RecipeRatingsEntity {
         return RecipeRatingsEntity.new {
-            userId = recipeRating.userId
-            recipeId = recipeRating.recipeId
+            userId = recipeRating.userid
+            recipeId = recipeRating.recipeid
             rating = recipeRating.rating
         }
     }

@@ -12,12 +12,19 @@ class RecipeRatingsService(
     override suspend fun postRating(userId: Long, recipeId: Long, rating: Float): RecipeRating {
 
         val recipeRating = RecipeRating(
-            userId = userId,
-            recipeId = recipeId,
+            id = 0,
+            userid = userId,
+            recipeid = recipeId,
             rating = rating
         )
         return recipeRatingsLoaderPort.postRating(recipeRating)
     }
 
+    override suspend fun getRatingsForRecipe(id: Long): List<RecipeRating> {
+        return recipeRatingsLoaderPort.getRatingsForRecipe(id)
+    }
 
+    override suspend fun getOverallRatingForRecipe(id: Long): Float {
+        return recipeRatingsLoaderPort.getOverallRatingForRecipe(id)
+    }
 }

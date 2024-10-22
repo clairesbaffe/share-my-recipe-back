@@ -39,7 +39,6 @@ fun Route.recipeController() {
             nbPersons = recipe.nbPersons,
             difficulty = recipe.difficulty,
             tags = recipe.tags,
-            ratings = recipe.ratings,
             authorId = recipe.authorId,
             date = recipe.date
         )
@@ -61,7 +60,6 @@ fun Route.recipeController() {
                 nbPersons = recipe.nbPersons,
                 difficulty = recipe.difficulty,
                 tags = recipe.tags,
-                ratings = recipe.ratings,
                 authorId = recipe.authorId,
                 date = recipe.date
             )
@@ -83,7 +81,6 @@ fun Route.recipeController() {
                 nbPersons = recipeRequest.nbPersons,
                 difficulty = recipeRequest.difficulty,
                 tags = recipeRequest.tags,
-                ratings = recipeRequest.ratings,
                 authorId = recipeRequest.authorId,
                 date = LocalDate.now()
             )
@@ -93,30 +90,5 @@ fun Route.recipeController() {
         }
     }
 
-    patch ("/{id}/ratings"){
-        try{
-            val recipeRequest = call.receive<RecipeRating>()
-            val recipeId = call.parameters["id"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
 
-            recipeUseCase.updateRecipeRating(recipeId, recipeRequest.rating)
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Recette créée avec succès"))
-        } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
-        }
-
-    }
-
-    get("/{id}/ratings"){
-        try{
-            val recipeRequest = call.receive<RecipeRating>()
-            val recipeId = call.parameters["id"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
-
-            val ratings = recipeUseCase.getRatingsForRecipe(recipeId)
-            call.respond(HttpStatusCode.OK, ratings)
-        } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
-        }
-    }
 }

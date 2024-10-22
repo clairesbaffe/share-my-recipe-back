@@ -14,11 +14,8 @@ interface RecipeUseCasePort {
         nbPersons: Int,
         difficulty: Float,
         tags: List<String>,
-        ratings: Float,
         authorId: Long,
         date: LocalDate
     ): Recipe
     suspend fun findAllRecipe(): List<Recipe>
-    suspend fun updateRecipeRating(id: Long, rating: Float): Recipe
-    suspend fun getRatingsForRecipe(id: Long): Float
 }

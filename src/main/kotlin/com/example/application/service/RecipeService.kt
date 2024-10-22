@@ -24,7 +24,6 @@ class RecipeService(
         nbPersons: Int,
         difficulty: Float,
         tags: List<String>,
-        ratings: Float,
         authorId: Long,
         date: LocalDate
     ): Recipe {
@@ -38,7 +37,6 @@ class RecipeService(
             nbPersons = nbPersons,
             difficulty = difficulty,
             tags = tags,
-            ratings = ratings,
             authorId = authorId,
             date = date
         )
@@ -49,11 +47,5 @@ class RecipeService(
         return recipeLoaderPort.findAllRecipe()
     }
 
-    override suspend fun updateRecipeRating(id: Long, rating: Float): Recipe {
-        return recipeLoaderPort.updateRecipeRating(id, rating)
-    }
 
-    override suspend fun getRatingsForRecipe(id: Long): Float {
-        return recipeLoaderPort.getRatingsForRecipe(id)
-    }
 }

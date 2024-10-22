@@ -20,7 +20,6 @@ CREATE TABLE recipe (
                         nb_persons INT NOT NULL,
                         difficulty FLOAT NOT NULL,
                         tags TEXT NOT NULL,
-                        ratings FLOAT NOT NULL,
                         author_id BIGINT NOT NULL,
                         date DATE NOT NULL,
                         CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES "user" (id)
