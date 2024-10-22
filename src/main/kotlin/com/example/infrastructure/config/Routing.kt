@@ -19,7 +19,7 @@ fun Application.configureRouting() {
                         libraryController()
                     }
                 }
-                route("/recipies") {
+                route("/recipes") {
                     withRole("USER") {
                         recipeController()
                     }
