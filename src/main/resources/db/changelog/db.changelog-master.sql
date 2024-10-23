@@ -35,37 +35,53 @@ CREATE TABLE recipeRatings (
                                CONSTRAINT fk_recipeId FOREIGN KEY (recipeId) REFERENCES recipe (id)
 );
 
--- Insert initial users
+-- Insert users
 -- changeset author:4
 INSERT INTO "user" (username, password_hash, roles, date) VALUES
                                                               ('chef1', 'hashedpassword1', 'USER', CURRENT_DATE),
                                                               ('chef2', 'hashedpassword2', 'USER', CURRENT_DATE),
-                                                              ('chef3', 'hashedpassword3', 'USER', CURRENT_DATE);
+                                                              ('chef3', 'hashedpassword3', 'USER', CURRENT_DATE),
+                                                              ('chef4', 'hashedpassword4', 'USER', CURRENT_DATE),
+                                                              ('chef5', 'hashedpassword5', 'USER', CURRENT_DATE);
 
--- Insert 10 French recipes
+-- Insert recipes
 -- changeset author:5
 INSERT INTO recipe (title, image, description, recette, preparation_time, nb_persons, difficulty, tags, author_id, date) VALUES
-                                                                                                                             ('Quiche Lorraine', 'image_url_1', 'Une délicieuse quiche au lard et au fromage.', '1. Préchauffer le four. 2. Préparer la pâte. 3. Ajouter les ingrédients. 4. Cuire au four.', 60, 4, 2.5, 'plat principal,quiche,français', 1, CURRENT_DATE),
-                                                                                                                             ('Soupe à l’oignon', 'image_url_2', 'Une soupe traditionnelle française avec des oignons caramélisés.', '1. Caraméliser les oignons. 2. Ajouter le bouillon. 3. Servir avec du pain grillé et du fromage.', 45, 6, 2.0, 'soupe,entrée,français', 2, CURRENT_DATE),
-                                                                                                                             ('Bœuf bourguignon', 'image_url_3', 'Un ragoût de bœuf mijoté dans du vin rouge avec des légumes.', '1. Faire dorer la viande. 2. Ajouter les légumes et le vin. 3. Mijoter plusieurs heures.', 240, 6, 4.5, 'plat principal,viande,français', 1, CURRENT_DATE),
-                                                                                                                             ('Ratatouille', 'image_url_4', 'Un mélange de légumes mijotés aux saveurs provençales.', '1. Couper et faire revenir les légumes. 2. Ajouter les herbes. 3. Cuire à feu doux.', 90, 4, 3.0, 'accompagnement,légumes,français', 3, CURRENT_DATE),
-                                                                                                                             ('Crème brûlée', 'image_url_5', 'Un dessert onctueux à base de crème et de vanille, avec une croûte caramélisée.', '1. Préparer la crème. 2. Cuire au bain-marie. 3. Caraméliser le sucre sur le dessus.', 50, 4, 2.5, 'dessert,français', 2, CURRENT_DATE),
-                                                                                                                             ('Tarte Tatin', 'image_url_6', 'Une tarte aux pommes caramélisées, servie à l’envers.', '1. Caraméliser les pommes. 2. Préparer la pâte. 3. Cuire et retourner.', 70, 6, 3.0, 'dessert,français', 3, CURRENT_DATE),
-                                                                                                                             ('Coq au vin', 'image_url_7', 'Un ragoût de poulet mijoté dans du vin rouge avec des champignons.', '1. Faire revenir le poulet. 2. Ajouter les légumes et le vin. 3. Mijoter longuement.', 180, 6, 4.0, 'plat principal,viande,français', 1, CURRENT_DATE),
-                                                                                                                             ('Salade niçoise', 'image_url_8', 'Une salade composée typique de la région niçoise.', '1. Préparer les légumes et le poisson. 2. Assaisonner avec de l’huile d’olive.', 30, 2, 1.5, 'entrée,salade,français', 2, CURRENT_DATE),
-                                                                                                                             ('Madeleines', 'image_url_9', 'Des petits gâteaux moelleux en forme de coquillage.', '1. Préparer la pâte. 2. Cuire dans des moules à madeleine.', 40, 8, 2.0, 'dessert,français', 3, CURRENT_DATE),
-                                                                                                                             ('Croissants', 'image_url_10', 'De délicieux croissants feuilletés.', '1. Préparer la pâte feuilletée. 2. Plier et cuire.', 120, 4, 4.0, 'petit déjeuner,français', 1, CURRENT_DATE);
+                                                                                                                             ('Soupe à l’oignon', 'image_url_1', 'Une délicieuse soupe traditionnelle française.',
+                                                                                                                              '{
+                                                                                                                                  "ingredients": ["Oignons", "Bouillon de bœuf", "Pain grillé", "Fromage râpé"],
+                                                                                                                                  "instructions": ["Caraméliser les oignons.", "Ajouter le bouillon et mijoter.", "Servir avec du pain grillé et du fromage."]
+                                                                                                                              }', 60, 4, 2.5, 'entrée,végétarien,traditionnel', 1, CURRENT_DATE),
 
--- Insert recipe ratings from users
+                                                                                                                             ('Ratatouille', 'image_url_2', 'Un plat provençal à base de légumes mijotés.',
+                                                                                                                              '{
+                                                                                                                                  "ingredients": ["Aubergines", "Courgettes", "Poivrons", "Tomates", "Oignons", "Herbes de Provence"],
+                                                                                                                                  "instructions": ["Couper les légumes.", "Faire revenir les oignons.", "Ajouter les légumes et les herbes.", "Mijoter à feu doux."]
+                                                                                                                              }', 90, 4, 3.0, 'plat principal,végétalien,sans gluten,vegan', 2, CURRENT_DATE),
+
+                                                                                                                             ('Quiche Lorraine', 'image_url_3', 'Une quiche savoureuse au lard fumé et au fromage.',
+                                                                                                                              '{
+                                                                                                                                  "ingredients": ["Pâte brisée", "Lardons", "Œufs", "Crème fraîche", "Gruyère râpé"],
+                                                                                                                                  "instructions": ["Préchauffer le four.", "Préparer la garniture.", "Verser sur la pâte.", "Cuire au four."]
+                                                                                                                              }', 60, 6, 2.0, 'plat principal,traditionnel', 3, CURRENT_DATE),
+
+                                                                                                                             ('Salade de quinoa', 'image_url_4', 'Une salade fraîche et nutritive.',
+                                                                                                                              '{
+                                                                                                                                  "ingredients": ["Quinoa", "Tomates cerises", "Concombre", "Féta", "Olives", "Vinaigrette"],
+                                                                                                                                  "instructions": ["Cuire le quinoa.", "Mélanger les légumes.", "Assaisonner avec la vinaigrette."]
+                                                                                                                              }', 30, 2, 1.5, 'entrée,végétarien,sans gluten,healthy', 4, CURRENT_DATE),
+
+                                                                                                                             ('Crêpes sucrées', 'image_url_5', 'De délicieuses crêpes fines et légères.',
+                                                                                                                              '{
+                                                                                                                                  "ingredients": ["Farine", "Œufs", "Lait", "Sucre", "Beurre"],
+                                                                                                                                  "instructions": ["Préparer la pâte à crêpes.", "Laisser reposer.", "Cuire les crêpes dans une poêle chaude."]
+                                                                                                                              }', 20, 4, 1.0, 'dessert,végétarien', 5, CURRENT_DATE);
+
+-- Insert recipe ratings
 -- changeset author:6
 INSERT INTO recipeRatings (userId, recipeId, rating) VALUES
                                                          (1, 1, 4.5),
                                                          (2, 2, 5.0),
                                                          (3, 3, 4.0),
-                                                         (1, 4, 3.5),
-                                                         (2, 5, 5.0),
-                                                         (3, 6, 4.5),
-                                                         (1, 7, 4.0),
-                                                         (2, 8, 4.5),
-                                                         (3, 9, 4.0),
-                                                         (1, 10, 5.0);
+                                                         (4, 4, 3.5),
+                                                         (5, 5, 5.0);
