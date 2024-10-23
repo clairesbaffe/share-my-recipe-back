@@ -7,12 +7,14 @@ import com.example.infrastructure.adapter.input.web.dto.RecipeResponseDTO
 import com.example.infrastructure.adapter.input.web.dto.RecipeDetails
 import com.example.infrastructure.adapter.input.web.dto.RecipeRating
 import com.example.infrastructure.exception.RecipeNotFound
+import com.example.infrastructure.model.UserSession
 import com.google.gson.Gson
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import org.koin.ktor.ext.inject
 import java.time.LocalDate
 
@@ -70,6 +72,8 @@ fun Route.recipeController() {
     post("") {
         val recipeRequest = call.receive<RecipeRequest>()
         try {
+            val userSession = call.sessions.get<UserSession>()
+                ?: throw IllegalArgumentException("User not logged in or session expired")
             val recetteJson = gson.toJson(recipeRequest.recette)
 
             recipeUseCase.postRecipe(
@@ -81,7 +85,7 @@ fun Route.recipeController() {
                 nbPersons = recipeRequest.nbPersons,
                 difficulty = recipeRequest.difficulty,
                 tags = recipeRequest.tags,
-                authorId = recipeRequest.authorId,
+                authorId = userSession.userId,
                 date = LocalDate.now()
             )
             call.respond(HttpStatusCode.Created, mapOf("message" to "Recette créée avec succès"))
