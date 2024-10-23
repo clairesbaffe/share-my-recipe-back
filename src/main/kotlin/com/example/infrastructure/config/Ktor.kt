@@ -48,6 +48,7 @@ fun Application.configureKtor(config: ApplicationConfig) {
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Post)
         allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Patch)
         allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Delete)
 
