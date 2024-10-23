@@ -16,14 +16,6 @@ import org.koin.core.annotation.Single
 
 @Single
 class RecipeRatingsRepository : RecipeRatingsLoaderPort {
-    override suspend fun postRating(recipeRating: RecipeRating): RecipeRating {
-        return withContext(Dispatchers.IO) {
-            transaction {
-                val entity = RecipeRatingsMapper.toEntity(recipeRating)
-                RecipeRatingsMapper.toDomain(entity)
-            }
-        }
-    }
 
     override suspend fun getRatingsForRecipe(recipeId: Long): List<RecipeRating> {
         return withContext(Dispatchers.IO) {
@@ -117,18 +109,23 @@ class RecipeRatingsRepository : RecipeRatingsLoaderPort {
     override suspend fun patchRating(userId: Long, recipeId: Long, rating: Float): RecipeRating? {
         return withContext(Dispatchers.IO) {
             transaction {
-                // Fetch the existing recipe rating for the given user and recipe
                 val existingRecipe = RecipeRatingsEntity.find {
                     (RecipeRatingsTable.recipeId eq recipeId) and (RecipeRatingsTable.userId eq userId)
                 }.singleOrNull()
 
-                // Handle the case where no rating exists
-                existingRecipe?.apply {
-                    this.rating = rating // Update the rating
-                } ?: throw IllegalArgumentException("No rating found for user $userId for recipe $recipeId")
+                val updatedRecipe = if (existingRecipe != null) {
+                    existingRecipe?.apply {
+                        this.rating = rating // Update the rating
+                    } ?: throw IllegalArgumentException("No rating found for user $userId for recipe $recipeId")
 
-                // Convert the entity to a domain model and return
-                RecipeRatingsMapper.toDomain(existingRecipe)
+                } else{
+                    RecipeRatingsEntity.new {
+                        this.userId = userId
+                        this.recipeId = recipeId
+                        this.rating = rating
+                    }
+                }
+                RecipeRatingsMapper.toDomain(updatedRecipe)
             }
         }
     }
