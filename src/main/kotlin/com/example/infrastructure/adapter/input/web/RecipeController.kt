@@ -18,8 +18,8 @@ fun Route.recipeController() {
     val recipeUseCase: RecipeUseCasePort by inject()
     val gson = Gson()
 
-    get("/{id}") {
-        try{
+    get("/recipes/{id}") {
+        try {
             val recipeId = call.parameters["id"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("Invalid or missing recipe ID")
 
@@ -28,7 +28,6 @@ fun Route.recipeController() {
 
             val (recipe, rating) = recipeUseCase.getRecipeByIdWithRate(recipeFound)
                 ?: throw RecipeNotFound("Recipe with id: $recipeId")
-
 
             val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
@@ -53,30 +52,63 @@ fun Route.recipeController() {
         } catch (e: IllegalArgumentException) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
         }
-
     }
 
-//    get("") {
-//        val recipes = recipeUseCase.findAllRecipe()
-//        val recipesDTO = recipes.map { recipe ->
-//            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
-//
-//            RecipeResponseDTO(
-//                id = recipe.id,
-//                title = recipe.title,
-//                image = recipe.image,
-//                description = recipe.description,
-//                recette = recetteDetails,
-//                preparationTime = recipe.preparationTime,
-//                nbPersons = recipe.nbPersons,
-//                difficulty = recipe.difficulty,
-//                tags = recipe.tags,
-//                authorId = recipe.authorId,
-//                date = recipe.date
-//            )
-//        }
-//        call.respond(HttpStatusCode.OK, recipesDTO)
-//    }
+    get("/recipes") {
+        val recipesWithRatings = recipeUseCase.getRecipeWithRate()
+
+        val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
+            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
+
+            RecipeWithRatingResponseDTO(
+                id = recipe.id,
+                title = recipe.title,
+                image = recipe.image,
+                description = recipe.description,
+                recette = recetteDetails,
+                preparationTime = recipe.preparationTime,
+                nbPersons = recipe.nbPersons,
+                difficulty = recipe.difficulty,
+                tags = recipe.tags,
+                authorId = recipe.authorId,
+                date = recipe.date,
+                rating = rating
+            )
+        }
+
+        call.respond(HttpStatusCode.OK, recipesDTO)
+    }
+
+    get("/recipes/ordered") {
+        val order = call.parameters["order"] ?: "asc"
+        val sortedBy = call.parameters["sortedBy"] ?: "ratings"
+        val recipesWithRatings = recipeUseCase.getRecipeOrderBy(order, sortedBy)
+
+        val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
+            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
+
+            RecipeWithRatingResponseDTO(
+                id = recipe.id,
+                title = recipe.title,
+                image = recipe.image,
+                description = recipe.description,
+                recette = recetteDetails,
+                preparationTime = recipe.preparationTime,
+                nbPersons = recipe.nbPersons,
+                difficulty = recipe.difficulty,
+                tags = recipe.tags,
+                authorId = recipe.authorId,
+                date = recipe.date,
+                rating = rating
+            )
+        }
+        call.respond(HttpStatusCode.OK, recipesDTO)
+    }
+}
+
+fun Route.postRecipeController() {
+    val recipeUseCase: RecipeUseCasePort by inject()
+    val gson = Gson()
 
     post("") {
         val recipeRequest = call.receive<RecipeRequest>()
@@ -102,59 +134,4 @@ fun Route.recipeController() {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
         }
     }
-
-    get("") {
-        val recipesWithRatings = recipeUseCase.getRecipeWithRate()
-
-        val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
-            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
-
-            RecipeWithRatingResponseDTO(
-                id = recipe.id,
-                title = recipe.title,
-                image = recipe.image,
-                description = recipe.description,
-                recette = recetteDetails,
-                preparationTime = recipe.preparationTime,
-                nbPersons = recipe.nbPersons,
-                difficulty = recipe.difficulty,
-                tags = recipe.tags,
-                authorId = recipe.authorId,
-                date = recipe.date,
-                rating = rating
-            )
-        }
-
-
-        call.respond(HttpStatusCode.OK, recipesDTO)
-    }
-
-    get("/ordered") {
-        val order = call.parameters["order"] ?: "asc"
-        val sortedBy = call.parameters["sortedBy"] ?: "ratings"
-        val recipesWithRatings = recipeUseCase.getRecipeOrderBy(order, sortedBy)
-
-        val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
-            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
-
-            RecipeWithRatingResponseDTO(
-                id = recipe.id,
-                title = recipe.title,
-                image = recipe.image,
-                description = recipe.description,
-                recette = recetteDetails,
-                preparationTime = recipe.preparationTime,
-                nbPersons = recipe.nbPersons,
-                difficulty = recipe.difficulty,
-                tags = recipe.tags,
-                authorId = recipe.authorId,
-                date = recipe.date,
-                rating = rating
-            )
-        }
-        call.respond(HttpStatusCode.OK, recipesDTO)
-    }
-
-
-
 }

@@ -14,10 +14,14 @@ fun Application.configureRouting() {
             logoutController()
             meController()
 
+            route("/public") {
+                recipeController()
+            }
+
             withSessionRenewal {
                 route("/recipes") {
                     withRole("USER") {
-                        recipeController()
+                        postRecipeController()
                     }
                 }
                 route("/ratings") {
