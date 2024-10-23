@@ -1,6 +1,7 @@
 package com.example.infrastructure.adapter.output.persistence
 
 import com.example.application.port.output.RecipeRatingsLoaderPort
+import com.example.domain.model.Recipe
 import com.example.domain.model.RecipeRating
 import com.example.infrastructure.adapter.output.entity.RecipeEntity
 import com.example.infrastructure.adapter.output.entity.RecipeRatingsEntity
@@ -17,10 +18,11 @@ import org.koin.core.annotation.Single
 @Single
 class RecipeRatingsRepository : RecipeRatingsLoaderPort {
 
-    override suspend fun getRatingsForRecipe(recipeId: Long): List<RecipeRating> {
+    override suspend fun getRatingsForRecipe(recipeId: Long, page: Int, limit: Int): List<RecipeRating> {
         return withContext(Dispatchers.IO) {
             transaction {
-                val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipeId }.toList()
+                val offset = (page-1) * limit
+                val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipeId }.limit(limit, offset = offset.toLong()).toList()
 
                 if (ratings.isEmpty()) {
                     throw IllegalArgumentException("Aucune évaluation trouvée pour cette recette avec l'ID: $recipeId")
@@ -65,12 +67,13 @@ class RecipeRatingsRepository : RecipeRatingsLoaderPort {
         }
     }
 
-    override suspend fun getRatingsByUser(userId: Long): List<RecipeRating> {
+    override suspend fun getRatingsByUser(userId: Long, page: Int, limit: Int): List<RecipeRating> {
         return withContext(Dispatchers.IO){
             transaction {
+                val offset = (page-1) * limit
                 val ratings = RecipeRatingsEntity.find {
                     RecipeRatingsTable.userId eq userId
-                }.toList()
+                }.limit(limit, offset = offset.toLong()).toList()
 
                 if (ratings.isEmpty()) {
                     throw IllegalArgumentException("Aucune évaluation trouvée pour le user $userId")
@@ -81,10 +84,11 @@ class RecipeRatingsRepository : RecipeRatingsLoaderPort {
         }
     }
 
-    override suspend fun getAllRates(): List<RecipeRating> {
+    override suspend fun getAllRates(page: Int, limit: Int): List<RecipeRating> {
         return withContext(Dispatchers.IO) {
             transaction {
-                RecipeRatingsEntity.all().map { RecipeRatingsMapper.toDomain(it) }
+                val offset = (page-1) * limit
+                RecipeRatingsEntity.all().limit(limit, offset = offset.toLong()).map { RecipeRatingsMapper.toDomain(it) }
             }
         }
     }
@@ -114,7 +118,7 @@ class RecipeRatingsRepository : RecipeRatingsLoaderPort {
 
                 val updatedRecipe = if (existingRecipe != null) {
                     existingRecipe?.apply {
-                        this.rating = rating // Update the rating
+                        this.rating = rating
                     } ?: throw IllegalArgumentException("No rating found for user $userId for recipe $recipeId")
 
                 } else{
@@ -128,7 +132,4 @@ class RecipeRatingsRepository : RecipeRatingsLoaderPort {
             }
         }
     }
-
-
-
 }

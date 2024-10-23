@@ -19,8 +19,12 @@ fun Route.recipeRatingsController() {
         try{
             val recipeId = call.parameters["recipeId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
+            val limit = call.parameters["limit"]?.toIntOrNull()
+                ?: 20
+            val page = call.parameters["page"]?.toIntOrNull()
+                ?: 1
 
-            val ratings = recipeRatingUseCase.getRatingsForRecipe(recipeId)
+            val ratings = recipeRatingUseCase.getRatingsForRecipe(recipeId, page, limit)
             call.respond(HttpStatusCode.OK, ratings)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes la recette")
@@ -71,8 +75,12 @@ fun Route.recipeRatingsController() {
         try{
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
+            val limit = call.parameters["limit"]?.toIntOrNull()
+                ?: 20
+            val page = call.parameters["page"]?.toIntOrNull()
+                ?: 1
 
-            val ratingByUser = recipeRatingUseCase.getRatingsByUser(userId)
+            val ratingByUser = recipeRatingUseCase.getRatingsByUser(userId, page, limit)
             call.respond(HttpStatusCode.OK, ratingByUser)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes effectuées par l'utilisateur")
@@ -83,8 +91,12 @@ fun Route.recipeRatingsController() {
         try{
             val userSession = call.sessions.get<UserSession>()
                 ?: throw IllegalArgumentException("User not logged in or session expired")
+            val limit = call.parameters["limit"]?.toIntOrNull()
+                ?: 20
+            val page = call.parameters["page"]?.toIntOrNull()
+                ?: 1
 
-            val ratingByUser = recipeRatingUseCase.getRatingsByUser(userSession.userId)
+            val ratingByUser = recipeRatingUseCase.getRatingsByUser(userSession.userId, page, limit)
             call.respond(HttpStatusCode.OK, ratingByUser)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes effectuées par l'utilisateur")
@@ -93,7 +105,11 @@ fun Route.recipeRatingsController() {
 
     get(""){
         try{
-            val allRates = recipeRatingUseCase.getAllRates()
+            val limit = call.parameters["limit"]?.toIntOrNull()
+                ?: 20
+            val page = call.parameters["page"]?.toIntOrNull()
+                ?: 1
+            val allRates = recipeRatingUseCase.getAllRates(page, limit)
             call.respond(HttpStatusCode.OK, allRates)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes")

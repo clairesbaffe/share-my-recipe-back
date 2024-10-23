@@ -83,7 +83,11 @@ fun Route.recipeController() {
     }
 
     get("") {
-        val recipesWithRatings = recipeUseCase.getRecipeWithRate()
+        val limit = call.parameters["limit"]?.toIntOrNull()
+            ?: 20
+        val page = call.parameters["page"]?.toIntOrNull()
+            ?: 1
+        val recipesWithRatings = recipeUseCase.getRecipeWithRate(page, limit)
         val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
             val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
@@ -109,7 +113,11 @@ fun Route.recipeController() {
     get("/ordered") {
         val order = call.parameters["order"] ?: "asc"
         val sortedBy = call.parameters["sortedBy"] ?: "ratings"
-        val recipesWithRatings = recipeUseCase.getRecipeOrderBy(order, sortedBy)
+        val limit = call.parameters["limit"]?.toIntOrNull()
+            ?: 20
+        val page = call.parameters["page"]?.toIntOrNull()
+            ?: 1
+        val recipesWithRatings = recipeUseCase.getRecipeOrderBy(order, sortedBy, page, limit)
 
         val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
             val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
@@ -134,9 +142,13 @@ fun Route.recipeController() {
 
     get("/users/{userId}"){
         try{
+            val limit = call.parameters["limit"]?.toIntOrNull()
+                ?: 20
+            val page = call.parameters["page"]?.toIntOrNull()
+                ?: 1
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
-            val recipesWithRatings = recipeUseCase.getRecipeByUser(userId)
+            val recipesWithRatings = recipeUseCase.getRecipeByUser(userId, page, limit)
             val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
                 val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
@@ -163,9 +175,13 @@ fun Route.recipeController() {
     }
     get("/users"){
         try{
+            val limit = call.parameters["limit"]?.toIntOrNull()
+                ?: 20
+            val page = call.parameters["page"]?.toIntOrNull()
+                ?: 1
             val userSession = call.sessions.get<UserSession>()
                 ?: throw IllegalArgumentException("User not logged in or session expired")
-            val recipesWithRatings = recipeUseCase.getRecipeByUser(userSession.userId)
+            val recipesWithRatings = recipeUseCase.getRecipeByUser(userSession.userId, page, limit)
             val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
                 val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
@@ -220,5 +236,6 @@ fun Route.recipeController() {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la suppression de la recette de l'utilisateur")
         }
     }
+
 
 }
