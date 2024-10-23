@@ -14,7 +14,6 @@ interface RecipeUseCasePort {
         nbPersons: Int,
         difficulty: Float,
         tags: List<String>,
-        ratings: Float,
         authorId: Long,
         date: LocalDate
     ): Recipe

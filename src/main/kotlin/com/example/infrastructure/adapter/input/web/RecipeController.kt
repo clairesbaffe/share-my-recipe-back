@@ -1,9 +1,11 @@
 package com.example.infrastructure.adapter.input.web
 
+import com.example.application.port.input.RecipeRatingsUseCasePort
 import com.example.application.port.input.RecipeUseCasePort
 import com.example.infrastructure.adapter.input.web.dto.RecipeRequest
 import com.example.infrastructure.adapter.input.web.dto.RecipeResponseDTO
 import com.example.infrastructure.adapter.input.web.dto.RecipeDetails
+import com.example.infrastructure.adapter.input.web.dto.RecipeRating
 import com.example.infrastructure.exception.RecipeNotFound
 import com.google.gson.Gson
 import io.ktor.http.*
@@ -37,7 +39,6 @@ fun Route.recipeController() {
             nbPersons = recipe.nbPersons,
             difficulty = recipe.difficulty,
             tags = recipe.tags,
-            ratings = recipe.ratings,
             authorId = recipe.authorId,
             date = recipe.date
         )
@@ -59,7 +60,6 @@ fun Route.recipeController() {
                 nbPersons = recipe.nbPersons,
                 difficulty = recipe.difficulty,
                 tags = recipe.tags,
-                ratings = recipe.ratings,
                 authorId = recipe.authorId,
                 date = recipe.date
             )
@@ -81,7 +81,6 @@ fun Route.recipeController() {
                 nbPersons = recipeRequest.nbPersons,
                 difficulty = recipeRequest.difficulty,
                 tags = recipeRequest.tags,
-                ratings = recipeRequest.ratings,
                 authorId = recipeRequest.authorId,
                 date = LocalDate.now()
             )
@@ -90,4 +89,6 @@ fun Route.recipeController() {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
         }
     }
+
+
 }

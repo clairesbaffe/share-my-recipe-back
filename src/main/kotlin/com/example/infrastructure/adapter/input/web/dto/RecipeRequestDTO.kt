@@ -9,11 +9,14 @@ data class RecipeRequest(
     val nbPersons: Int,
     val difficulty: Float,
     val tags: List<String>,
-    val ratings: Float,
     val authorId: Long,
 )
 
 data class RecipeDetails(
     val ingredients: List<String>,
     val instructions: List<String>
+)
+
+data class RecipeRating(
+    val rating: Float,
 )

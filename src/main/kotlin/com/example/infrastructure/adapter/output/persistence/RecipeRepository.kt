@@ -2,7 +2,10 @@ package com.example.infrastructure.adapter.output.persistence
 
 import com.example.application.port.output.RecipeLoaderPort
 import com.example.domain.model.Recipe
+import com.example.infrastructure.adapter.input.web.dto.RecipeRating
 import com.example.infrastructure.adapter.output.entity.RecipeEntity
+import com.example.infrastructure.adapter.output.entity.RecipeRatingsEntity
+import com.example.infrastructure.adapter.output.entity.RecipeRatingsTable
 import com.example.infrastructure.mapper.RecipeMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,4 +38,8 @@ class RecipeRepository : RecipeLoaderPort {
             }
         }
     }
+
+
+
+
 }

@@ -15,15 +15,14 @@ fun Application.configureRouting() {
             meController()
 
             withSessionRenewal {
-                route("/library") {
-                    withRole("USER") {
-                        libraryController()
-                    }
-                }
-
                 route("/recipes") {
                     withRole("USER") {
                         recipeController()
+                    }
+                }
+                route("/ratings") {
+                    withRole("USER") {
+                        recipeRatingsController()
                     }
                 }
 

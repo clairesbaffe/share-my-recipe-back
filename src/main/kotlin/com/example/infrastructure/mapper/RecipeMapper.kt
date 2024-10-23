@@ -21,7 +21,6 @@ object RecipeMapper {
             nbPersons = entity.nbPersons,
             difficulty = entity.difficulty,
             tags = tagsList,
-            ratings = entity.ratings,
             authorId = entity.authorId,
             date = entity.date
         )
@@ -39,9 +38,9 @@ object RecipeMapper {
             nbPersons = recipe.nbPersons
             difficulty = recipe.difficulty
             tags = tagsJson
-            ratings = recipe.ratings
             authorId = recipe.authorId
             date = recipe.date
         }
     }
+
 }

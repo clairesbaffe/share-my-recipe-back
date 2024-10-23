@@ -15,7 +15,6 @@ object RecipeTable : LongIdTable() {
     val nbPersons = integer("nb_persons")
     val difficulty = float("difficulty")
     val tags = text("tags")
-    val ratings = float("ratings")
     val authorId = long("author_id")
     val date = date("date")
 }
@@ -31,7 +30,6 @@ class RecipeEntity(id: EntityID<Long>) : LongEntity(id) {
     var nbPersons by RecipeTable.nbPersons
     var difficulty by RecipeTable.difficulty
     var tags by RecipeTable.tags
-    var ratings by RecipeTable.ratings
     var authorId by RecipeTable.authorId
     var date by RecipeTable.date
 }
