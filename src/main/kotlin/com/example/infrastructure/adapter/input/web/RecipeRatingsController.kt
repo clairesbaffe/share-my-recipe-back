@@ -53,6 +53,20 @@ fun Route.recipeRatingsController() {
         }
     }
 
+    get("{recipeId}"){
+        try{
+            val recipeId = call.parameters["recipeId"]?.toLongOrNull()
+                ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
+            val userSession = call.sessions.get<UserSession>()
+                ?: throw IllegalArgumentException("User not logged in or session expired")
+
+            val ratingByUser = recipeRatingUseCase.getRatingsForRecipeByUser(userSession.userId, recipeId)
+            call.respond(HttpStatusCode.OK, ratingByUser)
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+        }
+    }
+
     get("/users/{userId}"){
         try{
             val userId = call.parameters["userId"]?.toLongOrNull()

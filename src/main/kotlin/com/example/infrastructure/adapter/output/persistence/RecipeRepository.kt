@@ -43,6 +43,30 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
+    override suspend fun getRecipeByUser(userId: Long): List<Pair<Recipe, Float>>{
+        return withContext(Dispatchers.IO){
+            transaction {
+                val recipes = RecipeEntity.find {
+                    RecipeTable.authorId eq userId
+                }.toList()
+
+                recipes.map { recipeEntity ->
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                    val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+
+                    val averageRating = if (ratings.isNotEmpty()) {
+                        ratings.map { it.rating }.average().toFloat()
+                    } else {
+                        0f
+                    }
+
+                    recipe to averageRating
+                }
+            }
+        }
+    }
+
 
     override suspend fun getRecipeWithRate(): List<Pair<Recipe, Float>> {
         return withContext(Dispatchers.IO) {
@@ -117,4 +141,32 @@ class RecipeRepository : RecipeLoaderPort {
             }
         }
     }
+
+    override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?{
+        return withContext(Dispatchers.IO) {
+            transaction {
+
+                val ratingToDelete = RecipeRatingsEntity.find {
+                    (RecipeRatingsTable.recipeId eq recipeId)
+                }.singleOrNull()
+
+                ratingToDelete?.let {
+                    val domainRating = RecipeRatingsMapper.toDomain(it)
+                    it.delete()
+                    domainRating
+                }
+                val recipeToDelete = RecipeEntity.find {
+                    (RecipeTable.id eq recipeId) and (RecipeTable.authorId eq userId)
+                }.singleOrNull()
+
+                recipeToDelete?.let {
+                    val domainRating = RecipeMapper.toDomain(it)
+                    it.delete()
+                    domainRating
+                }
+            }
+        }
+    }
+
+
 }
