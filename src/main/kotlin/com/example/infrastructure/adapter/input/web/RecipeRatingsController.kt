@@ -23,25 +23,25 @@ fun Route.recipeRatingsController() {
             val ratings = recipeRatingUseCase.getRatingsForRecipe(recipeId)
             call.respond(HttpStatusCode.OK, ratings)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes la recette")
         }
     }
 
-    get("/{id}/overall"){
+    get("/{recipeId}/overall"){
         try{
-            val recipeId = call.parameters["id"]?.toLongOrNull()
+            val recipeId = call.parameters["recipeId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
 
             val overall = recipeRatingUseCase.getOverallRatingForRecipe(recipeId)
             call.respond(HttpStatusCode.OK, overall)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors du calcul de note globale de le recette")
         }
     }
 
-    get("{id}/{userId}"){
+    get("{recipeId}/{userId}"){
         try{
-            val recipeId = call.parameters["id"]?.toLongOrNull()
+            val recipeId = call.parameters["recipeId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID de recette invalide ou manquant")
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
@@ -49,7 +49,7 @@ fun Route.recipeRatingsController() {
             val ratingByUser = recipeRatingUseCase.getRatingsForRecipeByUser(userId, recipeId)
             call.respond(HttpStatusCode.OK, ratingByUser)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes")
         }
     }
 
@@ -63,7 +63,7 @@ fun Route.recipeRatingsController() {
             val ratingByUser = recipeRatingUseCase.getRatingsForRecipeByUser(userSession.userId, recipeId)
             call.respond(HttpStatusCode.OK, ratingByUser)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes")
         }
     }
 
@@ -75,7 +75,7 @@ fun Route.recipeRatingsController() {
             val ratingByUser = recipeRatingUseCase.getRatingsByUser(userId)
             call.respond(HttpStatusCode.OK, ratingByUser)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes effectuées par l'utilisateur")
         }
     }
 
@@ -87,7 +87,7 @@ fun Route.recipeRatingsController() {
             val ratingByUser = recipeRatingUseCase.getRatingsByUser(userSession.userId)
             call.respond(HttpStatusCode.OK, ratingByUser)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes effectuées par l'utilisateur")
         }
     }
 
@@ -96,37 +96,37 @@ fun Route.recipeRatingsController() {
             val allRates = recipeRatingUseCase.getAllRates()
             call.respond(HttpStatusCode.OK, allRates)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des notes")
         }
     }
 
     delete("/{recipeId}/{userId}" ){
         try {
             val recipeId = call.parameters["recipeId"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid or missing recipe ID")
+                ?: throw IllegalArgumentException("ID recette invalide ou manquant")
 
             val userId = call.parameters["userId"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid or missing user ID")
+                ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
 
             recipeRatingUseCase.deleteRating(recipeId, userId)
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Rating deleted successfully"))
+            call.respond(HttpStatusCode.Created, mapOf("message" to "La note $recipeId a bien été supprimée"))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Error while submitting rating")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la suppression de note")
         }
     }
 
     delete("/{recipeId}" ){
         try {
             val recipeId = call.parameters["recipeId"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid or missing recipe ID")
+                ?: throw IllegalArgumentException("ID recette invalide ou manquant")
 
             val userSession = call.sessions.get<UserSession>()
                 ?: throw IllegalArgumentException("User not logged in or session expired")
 
             recipeRatingUseCase.deleteRating(userSession.userId, recipeId)
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Rating deleted successfully"))
+            call.respond(HttpStatusCode.Created, mapOf("message" to "La note $recipeId a bien été supprimée"))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Error while submitting rating")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la suppression de note")
         }
     }
 
@@ -134,15 +134,15 @@ fun Route.recipeRatingsController() {
         try{
             val recipeRequest = call.receive<RecipeRating>()
             val recipeId = call.parameters["recipeId"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid or missing recipe ID")
+                ?: throw IllegalArgumentException("ID recette invalide ou manquant")
 
             val userId = call.parameters["userId"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid or missing user ID")
+                ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
 
             recipeRatingUseCase.patchRating(userId, recipeId, recipeRequest.rating)
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Rating modified successfully"))
+            call.respond(HttpStatusCode.Created, mapOf("message" to "La note $recipeId a bien été modifiée"))
         }catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Error while patching rating")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la modification de note")
         }
     }
 
@@ -150,15 +150,15 @@ fun Route.recipeRatingsController() {
         try{
             val recipeRequest = call.receive<RecipeRating>()
             val recipeId = call.parameters["recipeId"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid or missing recipe ID")
+                ?: throw IllegalArgumentException("ID recette invalide ou manquant")
 
             val userSession = call.sessions.get<UserSession>()
                 ?: throw IllegalArgumentException("User not logged in or session expired")
 
             recipeRatingUseCase.patchRating(userSession.userId, recipeId, recipeRequest.rating)
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Rating modified successfully"))
+            call.respond(HttpStatusCode.Created, mapOf("message" to "La note $recipeId a bien été modifiée"))
         }catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Error while patching rating")
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la suppression de note")
         }
     }
 }
