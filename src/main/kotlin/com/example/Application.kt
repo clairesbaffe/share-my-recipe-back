@@ -6,6 +6,7 @@ import com.example.infrastructure.config.*
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.application.*
 import io.ktor.server.config.*
+import io.ktor.server.routing.*
 
 fun main() {
     val config = HoconApplicationConfig(ConfigFactory.load())
