@@ -14,12 +14,12 @@ import io.ktor.server.sessions.*
 import org.koin.ktor.ext.inject
 import java.time.LocalDate
 
-fun Route.recipeController() {
+fun Route.publicRecipeController() {
     val recipeUseCase: RecipeUseCasePort by inject()
     val gson = Gson()
 
     get("/{id}") {
-        try{
+        try {
             val recipeId = call.parameters["id"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID recette invalide ou manquant")
 
@@ -28,7 +28,6 @@ fun Route.recipeController() {
 
             val (recipe, rating) = recipeUseCase.getRecipeByIdWithRate(recipeFound)
                 ?: throw RecipeNotFound("La recette $recipeId introuvable")
-
 
             val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
@@ -52,33 +51,6 @@ fun Route.recipeController() {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération de la recette")
         } catch (e: IllegalArgumentException) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération de la recette")
-        }
-
-    }
-
-
-    post("") {
-        val recipeRequest = call.receive<RecipeRequest>()
-        try {
-            val userSession = call.sessions.get<UserSession>()
-                ?: throw IllegalArgumentException("User not logged in or session expired")
-            val recetteJson = gson.toJson(recipeRequest.recette)
-
-            recipeUseCase.postRecipe(
-                title = recipeRequest.title,
-                image = recipeRequest.image,
-                description = recipeRequest.description,
-                recette = recetteJson,
-                preparationTime = recipeRequest.preparationTime,
-                nbPersons = recipeRequest.nbPersons,
-                difficulty = recipeRequest.difficulty,
-                tags = recipeRequest.tags,
-                authorId = userSession.userId,
-                date = LocalDate.now()
-            )
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Recette créée avec succès"))
-        } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
         }
     }
 
@@ -132,8 +104,8 @@ fun Route.recipeController() {
         call.respond(HttpStatusCode.OK, recipesDTO)
     }
 
-    get("/users/{userId}"){
-        try{
+    get("/users/{userId}") {
+        try {
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
             val recipesWithRatings = recipeUseCase.getRecipeByUser(userId)
@@ -157,12 +129,20 @@ fun Route.recipeController() {
             }
             call.respond(HttpStatusCode.OK, recipesDTO)
         } catch (e: Exception) {
-        call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des recettes de l'utilisateur")
+            call.respond(
+                HttpStatusCode.BadRequest,
+                e.message ?: "Erreur lors de la récupération des recettes de l'utilisateur"
+            )
+        }
     }
+}
 
-    }
-    get("/users"){
-        try{
+fun Route.recipeController() {
+    val recipeUseCase: RecipeUseCasePort by inject()
+    val gson = Gson()
+
+    get("/users") {
+        try {
             val userSession = call.sessions.get<UserSession>()
                 ?: throw IllegalArgumentException("User not logged in or session expired")
             val recipesWithRatings = recipeUseCase.getRecipeByUser(userSession.userId)
@@ -186,12 +166,39 @@ fun Route.recipeController() {
             }
             call.respond(HttpStatusCode.OK, recipesDTO)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la récupération des recettes de l'utilisateur actuel")
+            call.respond(
+                HttpStatusCode.BadRequest,
+                e.message ?: "Erreur lors de la récupération des recettes de l'utilisateur actuel"
+            )
         }
-
     }
 
-    delete("/{recipeId}/{userId}" ){
+    post("") {
+        val recipeRequest = call.receive<RecipeRequest>()
+        try {
+            val userSession = call.sessions.get<UserSession>()
+                ?: throw IllegalArgumentException("User not logged in or session expired")
+            val recetteJson = gson.toJson(recipeRequest.recette)
+
+            recipeUseCase.postRecipe(
+                title = recipeRequest.title,
+                image = recipeRequest.image,
+                description = recipeRequest.description,
+                recette = recetteJson,
+                preparationTime = recipeRequest.preparationTime,
+                nbPersons = recipeRequest.nbPersons,
+                difficulty = recipeRequest.difficulty,
+                tags = recipeRequest.tags,
+                authorId = userSession.userId,
+                date = LocalDate.now()
+            )
+            call.respond(HttpStatusCode.Created, mapOf("message" to "Recette créée avec succès"))
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la création de la recette")
+        }
+    }
+
+    delete("/{recipeId}/{userId}") {
         try {
             val recipeId = call.parameters["recipeId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID recette invalide ou manquant")
@@ -202,11 +209,14 @@ fun Route.recipeController() {
             recipeUseCase.deleteRecipe(userId, recipeId)
             call.respond(HttpStatusCode.Created, mapOf("message" to "La recette a bien été supprimée"))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la suppression de la recette de l'utilisateur")
+            call.respond(
+                HttpStatusCode.BadRequest,
+                e.message ?: "Erreur lors de la suppression de la recette de l'utilisateur"
+            )
         }
     }
 
-    delete("/{recipeId}" ){
+    delete("/{recipeId}") {
         try {
             val recipeId = call.parameters["recipeId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID recette invalide ou manquant")
@@ -217,8 +227,10 @@ fun Route.recipeController() {
             recipeUseCase.deleteRecipe(userSession.userId, recipeId)
             call.respond(HttpStatusCode.Created, mapOf("message" to "La recette a bien été supprimée"))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la suppression de la recette de l'utilisateur")
+            call.respond(
+                HttpStatusCode.BadRequest,
+                e.message ?: "Erreur lors de la suppression de la recette de l'utilisateur"
+            )
         }
     }
-
 }
