@@ -21,5 +21,8 @@ interface RecipeUseCasePort {
     suspend fun getRecipeWithRate(): List<Pair<Recipe, Float>>
     suspend fun getRecipeOrderBy(order: String, sortBy: String): List<Pair<Recipe, Float>>
     suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>?
+    suspend fun getRecipeByUser(userId: Long): List<Pair<Recipe, Float>>
+    suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?
+
 
 }

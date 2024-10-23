@@ -59,4 +59,12 @@ class RecipeService(
         return recipeLoaderPort.getRecipeByIdWithRate(recipe)
     }
 
+    override suspend fun getRecipeByUser(userId: Long): List<Pair<Recipe, Float>> {
+        return recipeLoaderPort.getRecipeByUser(userId)
+    }
+
+    override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?{
+        return recipeLoaderPort.deleteRecipe(userId, recipeId)
+    }
+
 }
