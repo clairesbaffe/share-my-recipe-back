@@ -47,5 +47,16 @@ class RecipeService(
         return recipeLoaderPort.findAllRecipe()
     }
 
+    override suspend fun getRecipeWithRate(): List<Pair<Recipe, Float>>{
+        return recipeLoaderPort.getRecipeWithRate()
+    }
+
+    override suspend fun getRecipeOrderBy(order: String, sortBy: String): List<Pair<Recipe, Float>>{
+        return recipeLoaderPort.getRecipeOrderBy(order, sortBy)
+    }
+
+    override suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>?{
+        return recipeLoaderPort.getRecipeByIdWithRate(recipe)
+    }
 
 }

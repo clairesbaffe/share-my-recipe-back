@@ -18,4 +18,8 @@ interface RecipeUseCasePort {
         date: LocalDate
     ): Recipe
     suspend fun findAllRecipe(): List<Recipe>
+    suspend fun getRecipeWithRate(): List<Pair<Recipe, Float>>
+    suspend fun getRecipeOrderBy(order: String, sortBy: String): List<Pair<Recipe, Float>>
+    suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>?
+
 }

@@ -15,3 +15,18 @@ data class RecipeResponseDTO(
     val authorId: Long,
     val date: LocalDate
 )
+
+data class RecipeWithRatingResponseDTO(
+    val id: Long,
+    val title: String,
+    val image: String,
+    val description: String,
+    val recette: RecipeDetails,
+    val preparationTime: Float,
+    val nbPersons: Int,
+    val difficulty: Float,
+    val tags: List<String>,
+    val authorId: Long,
+    val date: LocalDate,
+    val rating: Float
+)
