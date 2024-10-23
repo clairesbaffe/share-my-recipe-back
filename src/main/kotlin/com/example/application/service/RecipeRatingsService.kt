@@ -9,16 +9,6 @@ import org.koin.core.annotation.Single
 class RecipeRatingsService(
     private val recipeRatingsLoaderPort: RecipeRatingsLoaderPort
 ) : RecipeRatingsUseCasePort {
-    override suspend fun postRating(userId: Long, recipeId: Long, rating: Float): RecipeRating {
-
-        val recipeRating = RecipeRating(
-            id = 0,
-            userid = userId,
-            recipeid = recipeId,
-            rating = rating
-        )
-        return recipeRatingsLoaderPort.postRating(recipeRating)
-    }
 
     override suspend fun getRatingsForRecipe(id: Long): List<RecipeRating> {
         return recipeRatingsLoaderPort.getRatingsForRecipe(id)

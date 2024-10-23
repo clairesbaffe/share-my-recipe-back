@@ -14,21 +14,6 @@ import org.koin.ktor.ext.inject
 
 fun Route.recipeRatingsController() {
     val recipeRatingUseCase: RecipeRatingsUseCasePort by inject()
-    post("/{id}") {
-        try {
-            val userSession = call.sessions.get<UserSession>()
-                ?: throw IllegalArgumentException("User not logged in or session expired")
-
-            val recipeRequest = call.receive<RecipeRating>()
-            val recipeId = call.parameters["id"]?.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid or missing recipe ID")
-
-            recipeRatingUseCase.postRating(userSession.userId, recipeId, recipeRequest.rating)
-            call.respond(HttpStatusCode.Created, mapOf("message" to "Rating submitted successfully"))
-        } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, e.message ?: "Error while submitting rating")
-        }
-    }
 
     get("/recipe/{recipeId}"){
         try{
