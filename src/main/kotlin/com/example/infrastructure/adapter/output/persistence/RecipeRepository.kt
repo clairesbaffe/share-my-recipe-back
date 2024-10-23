@@ -43,12 +43,17 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
-    override suspend fun getRecipeByUser(userId: Long): List<Pair<Recipe, Float>>{
+    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Pair<Recipe, Float>>{
         return withContext(Dispatchers.IO){
             transaction {
+                val offset = (page-1) * limit
+                val count = RecipeEntity.find {
+                    RecipeTable.authorId eq userId
+                }.toList().size
+
                 val recipes = RecipeEntity.find {
                     RecipeTable.authorId eq userId
-                }.toList()
+                }.limit(limit, offset = offset.toLong()).toList()
 
                 recipes.map { recipeEntity ->
                     val recipe = RecipeMapper.toDomain(recipeEntity)
@@ -68,12 +73,13 @@ class RecipeRepository : RecipeLoaderPort {
     }
 
 
-    override suspend fun getRecipeWithRate(): List<Pair<Recipe, Float>> {
+    override suspend fun getRecipeWithRate(page: Int, limit: Int): List<Pair<Recipe, Float>> {
         return withContext(Dispatchers.IO) {
             transaction {
-                val recipes = RecipeEntity.all().toList() // Fetch all recipes
+                val offset = (page-1) * limit
+                val recipes = RecipeEntity.all().limit(limit, offset = offset.toLong()).toList()
                 recipes.map { recipeEntity ->
-                    val recipe = RecipeMapper.toDomain(recipeEntity) // Convert to domain Recipe model
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
 
                     val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
 
@@ -90,9 +96,10 @@ class RecipeRepository : RecipeLoaderPort {
     }
 
 
-    override suspend fun getRecipeOrderBy(order: String, sortBy: String): List<Pair<Recipe, Float>> {
+    override suspend fun getRecipeOrderBy(order: String, sortBy: String, page: Int, limit: Int): List<Pair<Recipe, Float>> {
         return withContext(Dispatchers.IO) {
             transaction {
+                val offset = (page-1) * limit
                 val recipes = RecipeEntity.all().toList()
 
                 val recipesWithRatings = recipes.map { recipeEntity ->
@@ -116,11 +123,13 @@ class RecipeRepository : RecipeLoaderPort {
                     else -> compareBy { it.second }
                 }
 
-                if (order == "desc") {
+                val sorted = if (order == "desc") {
                     recipesWithRatings.sortedWith(comparator.reversed())
                 } else {
                     recipesWithRatings.sortedWith(comparator)
                 }
+
+                sorted.drop(offset).take(limit)
             }
         }
     }
@@ -167,6 +176,4 @@ class RecipeRepository : RecipeLoaderPort {
             }
         }
     }
-
-
 }

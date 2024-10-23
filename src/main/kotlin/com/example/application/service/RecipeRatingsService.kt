@@ -10,8 +10,8 @@ class RecipeRatingsService(
     private val recipeRatingsLoaderPort: RecipeRatingsLoaderPort
 ) : RecipeRatingsUseCasePort {
 
-    override suspend fun getRatingsForRecipe(id: Long): List<RecipeRating> {
-        return recipeRatingsLoaderPort.getRatingsForRecipe(id)
+    override suspend fun getRatingsForRecipe(id: Long, page: Int, limit: Int): List<RecipeRating> {
+        return recipeRatingsLoaderPort.getRatingsForRecipe(id, page, limit)
     }
 
     override suspend fun getOverallRatingForRecipe(id: Long): Float {
@@ -22,12 +22,12 @@ class RecipeRatingsService(
         return recipeRatingsLoaderPort.getRatingsForRecipeByUser(userId, recipeId)
     }
 
-    override suspend fun getRatingsByUser(userId: Long): List<RecipeRating> {
-        return recipeRatingsLoaderPort.getRatingsByUser(userId)
+    override suspend fun getRatingsByUser(userId: Long, page: Int, limit: Int): List<RecipeRating> {
+        return recipeRatingsLoaderPort.getRatingsByUser(userId, page, limit)
     }
 
-    override suspend fun getAllRates(): List<RecipeRating> {
-        return recipeRatingsLoaderPort.getAllRates()
+    override suspend fun getAllRates(page: Int, limit: Int): List<RecipeRating> {
+        return recipeRatingsLoaderPort.getAllRates(page, limit)
     }
 
     override suspend fun deleteRating(userId: Long, recipeId: Long): RecipeRating? {

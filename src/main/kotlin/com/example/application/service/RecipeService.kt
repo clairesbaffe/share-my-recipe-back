@@ -47,24 +47,26 @@ class RecipeService(
         return recipeLoaderPort.findAllRecipe()
     }
 
-    override suspend fun getRecipeWithRate(): List<Pair<Recipe, Float>>{
-        return recipeLoaderPort.getRecipeWithRate()
+    override suspend fun getRecipeWithRate(page: Int, limit: Int): List<Pair<Recipe, Float>>{
+        return recipeLoaderPort.getRecipeWithRate(page, limit)
     }
 
-    override suspend fun getRecipeOrderBy(order: String, sortBy: String): List<Pair<Recipe, Float>>{
-        return recipeLoaderPort.getRecipeOrderBy(order, sortBy)
+    override suspend fun getRecipeOrderBy(order: String, sortBy: String, page: Int, limit: Int): List<Pair<Recipe, Float>>{
+        return recipeLoaderPort.getRecipeOrderBy(order, sortBy, page, limit)
     }
 
     override suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>?{
         return recipeLoaderPort.getRecipeByIdWithRate(recipe)
     }
 
-    override suspend fun getRecipeByUser(userId: Long): List<Pair<Recipe, Float>> {
-        return recipeLoaderPort.getRecipeByUser(userId)
+    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return recipeLoaderPort.getRecipeByUser(userId, page, limit)
     }
 
     override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?{
         return recipeLoaderPort.deleteRecipe(userId, recipeId)
     }
+
+
 
 }
