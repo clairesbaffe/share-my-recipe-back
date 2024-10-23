@@ -11,16 +11,15 @@ ENV PATH $GRADLE_HOME/bin:$PATH
 
 WORKDIR /app
 
-COPY . .
+COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY src ./src
 
-RUN gradle build -x test
+RUN gradle clean build -x test --parallel --no-daemon
 
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
 COPY --from=build /app/build/libs/ktor-challenge-web-all.jar .
-
-EXPOSE 8080
 
 CMD ["java", "-jar", "ktor-challenge-web-all.jar"]
