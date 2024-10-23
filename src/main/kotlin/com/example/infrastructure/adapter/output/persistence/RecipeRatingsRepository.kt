@@ -35,13 +35,12 @@ class RecipeRatingsRepository : RecipeRatingsLoaderPort {
         return withContext(Dispatchers.IO){
             transaction{
                 val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq id }.toList()
-
+                var overall = 0f
                 if (ratings.isEmpty()) {
-                    throw IllegalArgumentException("Aucune évaluation trouvée pour cette recette avec l'ID: $id")
+                    overall
                 }
 
                 var allRatings = ratings.map { RecipeRatingsMapper.toDomain(it) }
-                var overall = 0f
                 for (rating in allRatings) {
                     overall = overall + rating.rating
                 }

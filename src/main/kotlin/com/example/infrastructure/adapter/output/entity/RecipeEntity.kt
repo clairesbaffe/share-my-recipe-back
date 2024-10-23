@@ -1,5 +1,6 @@
 package com.example.infrastructure.adapter.output.entity
 
+import com.example.infrastructure.adapter.output.entity.RecipeRatingsTable.references
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -15,7 +16,7 @@ object RecipeTable : LongIdTable() {
     val nbPersons = integer("nb_persons")
     val difficulty = float("difficulty")
     val tags = text("tags")
-    val authorId = long("author_id")
+    val authorId = long("author_id").references(UserTable.id)
     val date = date("date")
 }
 
