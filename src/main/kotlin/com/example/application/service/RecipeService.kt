@@ -48,15 +48,20 @@ class RecipeService(
         return recipeLoaderPort.findAllRecipe()
     }
 
-    override suspend fun getRecipeWithRate(page: Int, limit: Int): List<Pair<Recipe, Float>>{
+    override suspend fun getRecipeWithRate(page: Int, limit: Int): List<Pair<Recipe, Float>> {
         return recipeLoaderPort.getRecipeWithRate(page, limit)
     }
 
-    override suspend fun getRecipeOrderBy(order: String, sortBy: String, page: Int, limit: Int): List<Pair<Recipe, Float>>{
+    override suspend fun getRecipeOrderBy(
+        order: String,
+        sortBy: String,
+        page: Int,
+        limit: Int
+    ): List<Pair<Recipe, Float>> {
         return recipeLoaderPort.getRecipeOrderBy(order, sortBy, page, limit)
     }
 
-    override suspend fun getRecipeByIdWithRate(recipe: Recipe): Triple<Recipe, Float, User>?{
+    override suspend fun getRecipeByIdWithRate(recipe: Recipe): Triple<Recipe, Float, User>? {
         return recipeLoaderPort.getRecipeByIdWithRate(recipe)
     }
 
@@ -64,11 +69,11 @@ class RecipeService(
         return recipeLoaderPort.getRecipeByUser(userId, page, limit)
     }
 
-    override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?{
+    override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe? {
         return recipeLoaderPort.deleteRecipe(userId, recipeId)
     }
 
-    override suspend fun searchRecipeWithStr(str: String, page: Int, limit: Int): List<Pair<Recipe, Float>>{
+    override suspend fun searchRecipeWithStr(str: String, page: Int, limit: Int): List<Pair<Recipe, Float>> {
         return recipeLoaderPort.searchRecipeWithStr(str, page, limit)
     }
 
@@ -85,7 +90,17 @@ class RecipeService(
         page: Int,
         limit: Int
     ): List<Pair<Recipe, Float>> {
-        return recipeLoaderPort.getByFilters(order, sortBy, nbPersons, preparationTime, exclusions, difficulty, tags, page, limit)
+        return recipeLoaderPort.getByFilters(
+            order,
+            sortBy,
+            nbPersons,
+            preparationTime,
+            exclusions,
+            difficulty,
+            tags,
+            page,
+            limit
+        )
     }
 
     override suspend fun getByTagsAny(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
@@ -96,5 +111,20 @@ class RecipeService(
         return recipeLoaderPort.getByTagsAll(tags, page, limit)
     }
 
-
+    override suspend fun getByFiltersWithQuery(
+        query: String,
+        order: String,
+        sortBy: String,
+        nbPersons: List<Int>,
+        preparationTime: List<Int>,
+        exclusions: List<String>,
+        difficulty: Int,
+        tags: List<String>,
+        page: Int,
+        limit: Int
+    ): List<Pair<Recipe, Float>> {
+        return recipeLoaderPort.getByFiltersWithQuery(
+            query, order, sortBy, nbPersons, preparationTime, exclusions, difficulty, tags, page, limit
+        )
+    }
 }

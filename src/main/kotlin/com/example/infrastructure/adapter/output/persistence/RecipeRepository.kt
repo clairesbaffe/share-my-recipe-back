@@ -48,10 +48,10 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
-    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Triple<Recipe, Float, User>>{
-        return withContext(Dispatchers.IO){
+    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Triple<Recipe, Float, User>> {
+        return withContext(Dispatchers.IO) {
             transaction {
-                val offset = (page-1) * limit
+                val offset = (page - 1) * limit
                 val recipes = RecipeEntity.find {
                     RecipeTable.authorId eq userId
                 }.limit(limit, offset = offset.toLong()).toList()
@@ -68,7 +68,7 @@ class RecipeRepository : RecipeLoaderPort {
                     }
 
                     val userEntity = UserEntity.findById(recipeEntity.authorId)!!
-                    val user = userEntity.let { UserMapper.toDomain(it)}
+                    val user = userEntity.let { UserMapper.toDomain(it) }
                     Triple(recipe, averageRating, user)
                 }
             }
@@ -79,7 +79,7 @@ class RecipeRepository : RecipeLoaderPort {
     override suspend fun getRecipeWithRate(page: Int, limit: Int): List<Pair<Recipe, Float>> {
         return withContext(Dispatchers.IO) {
             transaction {
-                val offset = (page-1) * limit
+                val offset = (page - 1) * limit
                 val recipes = RecipeEntity.all().limit(limit, offset = offset.toLong()).toList()
                 recipes.map { recipeEntity ->
                     val recipe = RecipeMapper.toDomain(recipeEntity)
@@ -99,10 +99,15 @@ class RecipeRepository : RecipeLoaderPort {
     }
 
 
-    override suspend fun getRecipeOrderBy(order: String, sortBy: String, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+    override suspend fun getRecipeOrderBy(
+        order: String,
+        sortBy: String,
+        page: Int,
+        limit: Int
+    ): List<Pair<Recipe, Float>> {
         return withContext(Dispatchers.IO) {
             transaction {
-                val offset = (page-1) * limit
+                val offset = (page - 1) * limit
                 val recipes = RecipeEntity.all().toList()
 
                 val recipesWithRatings = recipes.map { recipeEntity ->
@@ -150,13 +155,13 @@ class RecipeRepository : RecipeLoaderPort {
                 }
 
                 val userEntity = UserEntity.findById(recipe.authorId)!!
-                val user = userEntity.let { UserMapper.toDomain(it)}
+                val user = userEntity.let { UserMapper.toDomain(it) }
                 Triple(recipe, averageRating, user)
             }
         }
     }
 
-    override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?{
+    override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe? {
         return withContext(Dispatchers.IO) {
             transaction {
 
@@ -193,8 +198,7 @@ class RecipeRepository : RecipeLoaderPort {
                 val filteredRecipes = recipes.filter { recipeEntity ->
                     val recetteDetails: RecipeDetails = gson.fromJson(recipeEntity.recette, RecipeDetails::class.java)
 
-                    val ingredientsMatch = recetteDetails.ingredients.map {
-                            ingredient ->
+                    val ingredientsMatch = recetteDetails.ingredients.map { ingredient ->
                         ingredient.lowercase().contains(str.lowercase())
                     }
 
@@ -262,7 +266,17 @@ class RecipeRepository : RecipeLoaderPort {
             .map { it.trim().lowercase() }
     }
 
-    override suspend fun getByFilters( order: String, sortBy: String, nbPersons: List<Int>, preparationTime: List<Int>, exclusions: List<String>, difficulty: Int, tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+    override suspend fun getByFilters(
+        order: String,
+        sortBy: String,
+        nbPersons: List<Int>,
+        preparationTime: List<Int>,
+        exclusions: List<String>,
+        difficulty: Int,
+        tags: List<String>,
+        page: Int,
+        limit: Int
+    ): List<Pair<Recipe, Float>> {
         return withContext(Dispatchers.IO) {
             transaction {
                 val offset = (page - 1) * limit
@@ -335,7 +349,6 @@ class RecipeRepository : RecipeLoaderPort {
                 val offset = (page - 1) * limit
 
 
-
                 val recipes = RecipeEntity.all().toList()
 
                 val filteredRecipes = recipes.filter { recipeEntity ->
@@ -343,7 +356,7 @@ class RecipeRepository : RecipeLoaderPort {
                     val tagsMatch = parseTags(recipeEntity.tags).map { it.lowercase().replace("\"", "") }
                         .any { it in tags.map { tag -> tag.lowercase() } }
 
-                   tagsMatch
+                    tagsMatch
                 }
 
                 filteredRecipes.drop(offset).take(limit).map { recipeEntity ->
@@ -358,7 +371,6 @@ class RecipeRepository : RecipeLoaderPort {
 
                     recipe to averageRating
                 }
-
 
 
             }
@@ -395,10 +407,94 @@ class RecipeRepository : RecipeLoaderPort {
                 }
 
 
-
             }
         }
     }
 
+    override suspend fun getByFiltersWithQuery(
+        query: String,
+        order: String,
+        sortBy: String,
+        nbPersons: List<Int>,
+        preparationTime: List<Int>,
+        exclusions: List<String>,
+        difficulty: Int,
+        tags: List<String>,
+        page: Int,
+        limit: Int
+    ): List<Pair<Recipe, Float>> {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val offset = (page - 1) * limit
+                val gson = Gson()
+
+                var conditions: Op<Boolean> = (RecipeTable.difficulty lessEq difficulty)
+
+                if (nbPersons.size == 2) {
+                    conditions = conditions and (RecipeTable.nbPersons lessEq nbPersons[1]) and
+                            (RecipeTable.nbPersons greaterEq nbPersons[0])
+                }
+
+                if (preparationTime.size == 2) {
+                    conditions = conditions and (RecipeTable.preparationTime lessEq preparationTime[1]) and
+                            (RecipeTable.preparationTime greaterEq preparationTime[0])
+                }
+
+                val recipes = RecipeEntity.find { conditions }.toList()
+
+                val filteredRecipes = recipes.filter { recipeEntity ->
+                    val recetteDetails: RecipeDetails = gson.fromJson(recipeEntity.recette, RecipeDetails::class.java)
+
+                    val ingredientsMatch = recetteDetails.ingredients.any { ingredient ->
+                        ingredient.lowercase().contains(query.lowercase())
+                    }
+                    val titleMatch = recipeEntity.title.lowercase().contains(query.lowercase())
+                    val descriptionMatch = recipeEntity.description.lowercase().contains(query.lowercase())
+
+                    ingredientsMatch || titleMatch || descriptionMatch
+                }
+
+                val filteredByListsRecipes = filteredRecipes.filter { recipeEntity ->
+                    val recetteDetails: RecipeDetails = gson.fromJson(recipeEntity.recette, RecipeDetails::class.java)
+
+                    val ingredientsMatch = recetteDetails.ingredients.map { it.lowercase() }
+                        .none { it in exclusions.map { exclusion -> exclusion.lowercase() } }
+
+                    val tagsMatch = parseTags(recipeEntity.tags).map { it.lowercase().replace("\"", "") }
+                        .containsAll(tags.map { it.lowercase() })
+
+                    ingredientsMatch && tagsMatch
+                }
+
+                val recipesWithRatings = filteredByListsRecipes.map { recipeEntity ->
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                    val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+                    val averageRating = if (ratings.isNotEmpty()) {
+                        ratings.map { it.rating }.average().toFloat()
+                    } else {
+                        0f
+                    }
+
+                    recipe to averageRating
+                }
+
+                val comparator = when (sortBy) {
+                    "ratings" -> compareBy<Pair<Recipe, Float>> { it.second }
+                    "dates" -> compareBy { it.first.date }
+                    "difficulty" -> compareBy { it.first.difficulty }
+                    else -> compareBy { it.second }
+                }
+
+                val sortedRecipes = if (order == "desc") {
+                    recipesWithRatings.sortedWith(comparator.reversed())
+                } else {
+                    recipesWithRatings.sortedWith(comparator)
+                }
+
+                sortedRecipes.drop(offset).take(limit)
+            }
+        }
+    }
 
 }
