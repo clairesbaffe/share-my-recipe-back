@@ -2,16 +2,18 @@ package com.example.infrastructure.adapter.output.persistence
 
 import com.example.application.port.output.RecipeLoaderPort
 import com.example.domain.model.Recipe
+import com.example.domain.model.User
+import com.example.infrastructure.adapter.input.web.dto.RecipeDetails
 import com.example.infrastructure.adapter.input.web.dto.RecipeRating
-import com.example.infrastructure.adapter.output.entity.RecipeEntity
-import com.example.infrastructure.adapter.output.entity.RecipeRatingsEntity
-import com.example.infrastructure.adapter.output.entity.RecipeRatingsTable
-import com.example.infrastructure.adapter.output.entity.RecipeTable
+import com.example.infrastructure.adapter.output.entity.*
 import com.example.infrastructure.mapper.RecipeMapper
 import com.example.infrastructure.mapper.RecipeRatingsMapper
+import com.example.infrastructure.mapper.UserMapper
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.annotation.Single
@@ -43,14 +45,10 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
-    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Pair<Recipe, Float>>{
+    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Triple<Recipe, Float, User>>{
         return withContext(Dispatchers.IO){
             transaction {
                 val offset = (page-1) * limit
-                val count = RecipeEntity.find {
-                    RecipeTable.authorId eq userId
-                }.toList().size
-
                 val recipes = RecipeEntity.find {
                     RecipeTable.authorId eq userId
                 }.limit(limit, offset = offset.toLong()).toList()
@@ -66,7 +64,9 @@ class RecipeRepository : RecipeLoaderPort {
                         0f
                     }
 
-                    recipe to averageRating
+                    val userEntity = UserEntity.findById(recipeEntity.authorId)!!
+                    val user = userEntity.let { UserMapper.toDomain(it)}
+                    Triple(recipe, averageRating, user)
                 }
             }
         }
@@ -176,4 +176,43 @@ class RecipeRepository : RecipeLoaderPort {
             }
         }
     }
+
+    override suspend fun searchRecipeWithStr(str: String, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val offset = (page - 1) * limit
+                val gson = Gson()
+
+                val recipes = RecipeEntity.all().toList()
+
+                val filteredRecipes = recipes.filter { recipeEntity ->
+                    val recetteDetails: RecipeDetails = gson.fromJson(recipeEntity.recette, RecipeDetails::class.java)
+
+                    val ingredientsMatch = recetteDetails.ingredients.map {
+                            ingredient ->
+                        ingredient.lowercase().contains(str.lowercase())
+                    }
+
+                    ingredientsMatch.contains(true) || recipeEntity.title.lowercase().contains(str.lowercase()) ||
+                            recipeEntity.description.lowercase().contains(str.lowercase())
+                }
+
+                filteredRecipes.drop(offset).take(limit).map { recipeEntity ->
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                    val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+                    val averageRating = if (ratings.isNotEmpty()) {
+                        ratings.map { it.rating }.average().toFloat()
+                    } else {
+                        0f
+                    }
+
+                    recipe to averageRating
+                }
+
+            }
+        }
+    }
+
+
 }

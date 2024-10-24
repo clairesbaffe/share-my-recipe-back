@@ -121,10 +121,10 @@ fun Route.publicRecipeController() {
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
             val recipesWithRatings = recipeUseCase.getRecipeByUser(userId, page, limit)
-            val recipesDTO = recipesWithRatings.map { (recipe, rating) ->
+            val recipesDTO = recipesWithRatings.map { (recipe, rating, user) ->
                 val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
-                RecipeWithRatingResponseDTO(
+                RecipeWithRatingAndUsernameResponseDTO(
                     id = recipe.id,
                     title = recipe.title,
                     image = recipe.image,
@@ -134,7 +134,8 @@ fun Route.publicRecipeController() {
                     nbPersons = recipe.nbPersons,
                     difficulty = recipe.difficulty,
                     tags = recipe.tags,
-                    authorId = recipe.authorId,
+                    authorId = user.id,
+                    authorName = user.username,
                     date = recipe.date,
                     rating = rating
                 )
@@ -146,6 +147,35 @@ fun Route.publicRecipeController() {
                 e.message ?: "Erreur lors de la récupération des recettes de l'utilisateur"
             )
         }
+    }
+
+    get("/popo"){
+        val recipeRequest = call.receive<SearchRecipes>()
+        val limit = call.parameters["limit"]?.toIntOrNull()
+            ?: 20
+        val page = call.parameters["page"]?.toIntOrNull()
+            ?: 1
+
+        val searched = recipeUseCase.searchRecipeWithStr(recipeRequest.search, page, limit)
+        val recipesDTO = searched.map { (recipe, rating) ->
+            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
+
+            RecipeWithRatingResponseDTO(
+                id = recipe.id,
+                title = recipe.title,
+                image = recipe.image,
+                description = recipe.description,
+                recette = recetteDetails,
+                preparationTime = recipe.preparationTime,
+                nbPersons = recipe.nbPersons,
+                difficulty = recipe.difficulty,
+                tags = recipe.tags,
+                authorId = recipe.authorId,
+                date = recipe.date,
+                rating = rating
+            )
+        }
+        call.respond(HttpStatusCode.OK, recipesDTO)
     }
 }
 

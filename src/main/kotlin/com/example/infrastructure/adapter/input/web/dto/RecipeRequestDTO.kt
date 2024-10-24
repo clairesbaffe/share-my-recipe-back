@@ -19,3 +19,7 @@ data class RecipeDetails(
 data class RecipeRating(
     val rating: Float,
 )
+
+data class SearchRecipes(
+    val search: String
+)

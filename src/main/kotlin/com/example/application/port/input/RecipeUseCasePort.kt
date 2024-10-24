@@ -1,6 +1,7 @@
 package com.example.application.port.input
 
 import com.example.domain.model.Recipe
+import com.example.domain.model.User
 import java.time.LocalDate
 
 interface RecipeUseCasePort {
@@ -21,7 +22,8 @@ interface RecipeUseCasePort {
     suspend fun getRecipeWithRate(page: Int, limit: Int): List<Pair<Recipe, Float>>
     suspend fun getRecipeOrderBy(order: String, sortBy: String, page: Int, limit: Int): List<Pair<Recipe, Float>>
     suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>?
-    suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Pair<Recipe, Float>>
+    suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Triple<Recipe, Float, User>>
     suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?
+    suspend fun searchRecipeWithStr(str: String, page: Int, limit: Int): List<Pair<Recipe, Float>>
 
 }

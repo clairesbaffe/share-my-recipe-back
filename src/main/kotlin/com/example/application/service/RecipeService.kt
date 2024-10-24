@@ -3,6 +3,7 @@ package com.example.application.service
 import com.example.application.port.input.RecipeUseCasePort
 import com.example.application.port.output.RecipeLoaderPort
 import com.example.domain.model.Recipe
+import com.example.domain.model.User
 import org.koin.core.annotation.Single
 import java.time.LocalDate
 
@@ -59,12 +60,16 @@ class RecipeService(
         return recipeLoaderPort.getRecipeByIdWithRate(recipe)
     }
 
-    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+    override suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Triple<Recipe, Float, User>> {
         return recipeLoaderPort.getRecipeByUser(userId, page, limit)
     }
 
     override suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?{
         return recipeLoaderPort.deleteRecipe(userId, recipeId)
+    }
+
+    override suspend fun searchRecipeWithStr(str: String, page: Int, limit: Int): List<Pair<Recipe, Float>>{
+        return recipeLoaderPort.searchRecipeWithStr(str, page, limit)
     }
 
 

@@ -34,3 +34,4 @@ class RecipeEntity(id: EntityID<Long>) : LongEntity(id) {
     var authorId by RecipeTable.authorId
     var date by RecipeTable.date
 }
+
