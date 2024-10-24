@@ -26,12 +26,12 @@ fun Route.publicRecipeController() {
             val recipeFound = recipeUseCase.findRecipeById(recipeId)
                 ?: throw RecipeNotFound("La recette $recipeId introuvable")
 
-            val (recipe, rating) = recipeUseCase.getRecipeByIdWithRate(recipeFound)
+            val (recipe, rating, user) = recipeUseCase.getRecipeByIdWithRate(recipeFound)
                 ?: throw RecipeNotFound("La recette $recipeId introuvable")
 
             val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
-            val recipeResponseDTO = RecipeWithRatingResponseDTO(
+            val recipeResponseDTO = RecipeWithRatingAndUsernameResponseDTO(
                 id = recipe.id,
                 title = recipe.title,
                 image = recipe.image,
@@ -42,6 +42,7 @@ fun Route.publicRecipeController() {
                 difficulty = recipe.difficulty,
                 tags = recipe.tags,
                 authorId = recipe.authorId,
+                authorName = user.username,
                 date = recipe.date,
                 rating = rating
             )

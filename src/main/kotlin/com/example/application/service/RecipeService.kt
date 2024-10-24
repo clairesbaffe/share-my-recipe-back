@@ -56,7 +56,7 @@ class RecipeService(
         return recipeLoaderPort.getRecipeOrderBy(order, sortBy, page, limit)
     }
 
-    override suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>?{
+    override suspend fun getRecipeByIdWithRate(recipe: Recipe): Triple<Recipe, Float, User>?{
         return recipeLoaderPort.getRecipeByIdWithRate(recipe)
     }
 

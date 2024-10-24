@@ -92,7 +92,7 @@ class RecipeRepository : RecipeLoaderPort {
                         0f
                     }
 
-                    recipe to averageRating // Return a pair of Recipe and average rating
+                    recipe to averageRating
                 }
             }
         }
@@ -137,7 +137,7 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
-    override suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>? {
+    override suspend fun getRecipeByIdWithRate(recipe: Recipe): Triple<Recipe, Float, User>? {
         return withContext(Dispatchers.IO) {
             transaction {
 
@@ -149,7 +149,9 @@ class RecipeRepository : RecipeLoaderPort {
                     0f
                 }
 
-                recipe to averageRating
+                val userEntity = UserEntity.findById(recipe.authorId)!!
+                val user = userEntity.let { UserMapper.toDomain(it)}
+                Triple(recipe, averageRating, user)
             }
         }
     }

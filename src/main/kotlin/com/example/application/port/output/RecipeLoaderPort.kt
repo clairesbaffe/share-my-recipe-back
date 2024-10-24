@@ -9,7 +9,7 @@ interface RecipeLoaderPort {
     suspend fun findAllRecipe(): List<Recipe>
     suspend fun getRecipeWithRate(page: Int, limit: Int, ): List<Pair<Recipe, Float>>
     suspend fun getRecipeOrderBy(order: String, sortBy: String, page: Int, limit: Int): List<Pair<Recipe, Float>>
-    suspend fun getRecipeByIdWithRate(recipe: Recipe): Pair<Recipe, Float>?
+    suspend fun getRecipeByIdWithRate(recipe: Recipe): Triple<Recipe, Float, User>?
     suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Triple<Recipe, Float, User>>
     suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?
     suspend fun searchRecipeWithStr(str: String, page: Int, limit: Int): List<Pair<Recipe, Float>>
