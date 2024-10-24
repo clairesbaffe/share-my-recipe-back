@@ -257,9 +257,9 @@ class RecipeRepository : RecipeLoaderPort {
         return tagsString
             .replace("[", "")
             .replace("]", "")
-            .replace("'", "") // Enlever les apostrophes si nécessaire
+            .replace("'", "")
             .split(",")
-            .map { it.trim().lowercase() } // Convertir en minuscules et supprimer les espaces
+            .map { it.trim().lowercase() }
     }
 
     override suspend fun getByFilters( order: String, sortBy: String, nbPersons: List<Int>, preparationTime: List<Int>, exclusions: List<String>, difficulty: Int, tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
@@ -329,10 +329,11 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
-    override suspend fun getByTags(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+    override suspend fun getByTagsAny(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
         return withContext(Dispatchers.IO) {
             transaction {
                 val offset = (page - 1) * limit
+
 
 
                 val recipes = RecipeEntity.all().toList()
@@ -343,6 +344,41 @@ class RecipeRepository : RecipeLoaderPort {
                         .any { it in tags.map { tag -> tag.lowercase() } }
 
                    tagsMatch
+                }
+
+                filteredRecipes.drop(offset).take(limit).map { recipeEntity ->
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                    val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+                    val averageRating = if (ratings.isNotEmpty()) {
+                        ratings.map { it.rating }.average().toFloat()
+                    } else {
+                        0f
+                    }
+
+                    recipe to averageRating
+                }
+
+
+
+            }
+        }
+    }
+
+    override suspend fun getByTagsAll(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val offset = (page - 1) * limit
+
+
+                val recipes = RecipeEntity.all().toList()
+
+                val filteredRecipes = recipes.filter { recipeEntity ->
+
+                    val tagsMatch = parseTags(recipeEntity.tags).map { it.lowercase().replace("\"", "") }
+                        .containsAll(tags.map { it.lowercase() })
+
+                    tagsMatch
                 }
 
                 filteredRecipes.drop(offset).take(limit).map { recipeEntity ->
