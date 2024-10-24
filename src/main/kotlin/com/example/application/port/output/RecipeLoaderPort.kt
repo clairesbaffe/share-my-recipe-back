@@ -29,4 +29,5 @@ interface RecipeLoaderPort {
     ): List<Pair<Recipe, Float>>
     suspend fun getByTagsAny(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>>
     suspend fun getByTagsAll(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>>
+    suspend fun getRecipeByIdByUserSession(recipeId: Long, userId: Long): Pair<Recipe, Float>?
 }

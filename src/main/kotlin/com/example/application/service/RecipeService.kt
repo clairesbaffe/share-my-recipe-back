@@ -111,6 +111,11 @@ class RecipeService(
         return recipeLoaderPort.getByTagsAll(tags, page, limit)
     }
 
+    override suspend fun getRecipeByIdByUserSession(recipeId: Long, userId: Long): Pair<Recipe, Float>? {
+        return recipeLoaderPort.getRecipeByIdByUserSession(recipeId, userId)
+    }
+
+
     override suspend fun getByFiltersWithQuery(
         query: String,
         order: String,

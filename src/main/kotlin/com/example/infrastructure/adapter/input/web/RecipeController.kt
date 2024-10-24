@@ -294,6 +294,8 @@ fun Route.publicRecipeController() {
 
         call.respond(HttpStatusCode.OK, recipesDTO)
     }
+
+
 }
 
 
@@ -395,6 +397,46 @@ fun Route.recipeController() {
                 HttpStatusCode.BadRequest,
                 e.message ?: "Erreur lors de la suppression de la recette de l'utilisateur"
             )
+        }
+    }
+
+    get("/{recipeId}"){
+        try{
+            val recipeId = call.parameters["recipeId"]?.toLongOrNull()
+                ?: throw IllegalArgumentException("ID recette invalide ou manquant")
+
+            val userSession = call.sessions.get<UserSession>()
+                ?: throw IllegalArgumentException("User not logged in or session expired")
+
+            val recipeWithRating = recipeUseCase.getRecipeByIdByUserSession(recipeId, userSession.userId)
+
+            if (recipeWithRating != null) {
+                val (recipe, rating) = recipeWithRating
+
+                val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
+
+                val recipeResponseDTO = RecipeWithRatingResponseDTO(
+                    id = recipe.id,
+                    title = recipe.title,
+                    image = recipe.image,
+                    description = recipe.description,
+                    recette = recetteDetails,
+                    preparationTime = recipe.preparationTime,
+                    nbPersons = recipe.nbPersons,
+                    difficulty = recipe.difficulty,
+                    tags = recipe.tags,
+                    authorId = recipe.authorId,
+                    date = recipe.date,
+                    rating = rating
+                )
+
+                call.respond(HttpStatusCode.OK, recipeResponseDTO)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "La recette demandée ne match pas avec le user connecté")
+            }
+
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.BadRequest, "une erreur est survenue durant la requete")
         }
     }
 
