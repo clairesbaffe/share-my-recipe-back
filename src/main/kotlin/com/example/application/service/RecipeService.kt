@@ -72,6 +72,9 @@ class RecipeService(
         return recipeLoaderPort.searchRecipeWithStr(str, page, limit)
     }
 
+    override suspend fun getByIngredients(ingredients: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return recipeLoaderPort.getByIngredients(ingredients, page, limit)
+    }
 
 
 }

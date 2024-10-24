@@ -214,5 +214,39 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
+    override suspend fun getByIngredients(ingredients: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val offset = (page - 1) * limit
+                val gson = Gson()
+
+                val recipes = RecipeEntity.all().toList()
+
+                val filteredRecipes = recipes.filter { recipeEntity ->
+                    val recetteDetails: RecipeDetails = gson.fromJson(recipeEntity.recette, RecipeDetails::class.java)
+
+                    val ingredientsMatch = recetteDetails.ingredients.map { it.lowercase() }
+                        .containsAll(ingredients.map { it.lowercase() })
+
+                    ingredientsMatch
+                }
+
+                filteredRecipes.drop(offset).take(limit).map { recipeEntity ->
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                    val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+                    val averageRating = if (ratings.isNotEmpty()) {
+                        ratings.map { it.rating }.average().toFloat()
+                    } else {
+                        0f
+                    }
+
+                    recipe to averageRating
+                }
+
+            }
+        }
+    }
+
 
 }

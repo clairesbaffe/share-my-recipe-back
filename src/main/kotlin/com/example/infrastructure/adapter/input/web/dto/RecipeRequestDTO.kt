@@ -23,3 +23,7 @@ data class RecipeRating(
 data class SearchRecipes(
     val search: String
 )
+
+data class SearchRecipesByIngredients(
+    val search: List<String>
+)

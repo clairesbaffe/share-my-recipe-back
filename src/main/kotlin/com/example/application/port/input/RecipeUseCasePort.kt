@@ -25,5 +25,6 @@ interface RecipeUseCasePort {
     suspend fun getRecipeByUser(userId: Long, page: Int, limit: Int): List<Triple<Recipe, Float, User>>
     suspend fun deleteRecipe(userId: Long, recipeId: Long): Recipe?
     suspend fun searchRecipeWithStr(str: String, page: Int, limit: Int): List<Pair<Recipe, Float>>
+    suspend fun getByIngredients(ingredients: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>>
 
 }

@@ -149,7 +149,7 @@ fun Route.publicRecipeController() {
         }
     }
 
-    get("/popo"){
+    get("/search"){
         val recipeRequest = call.receive<SearchRecipes>()
         val limit = call.parameters["limit"]?.toIntOrNull()
             ?: 20
@@ -177,7 +177,38 @@ fun Route.publicRecipeController() {
         }
         call.respond(HttpStatusCode.OK, recipesDTO)
     }
+
+    get("/search/ingredients"){
+        val recipeRequest = call.receive<SearchRecipesByIngredients>()
+        val limit = call.parameters["limit"]?.toIntOrNull()
+            ?: 20
+        val page = call.parameters["page"]?.toIntOrNull()
+            ?: 1
+
+        val searched = recipeUseCase.getByIngredients(recipeRequest.search, page, limit)
+        val recipesDTO = searched.map { (recipe, rating) ->
+            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
+
+            RecipeWithRatingResponseDTO(
+                id = recipe.id,
+                title = recipe.title,
+                image = recipe.image,
+                description = recipe.description,
+                recette = recetteDetails,
+                preparationTime = recipe.preparationTime,
+                nbPersons = recipe.nbPersons,
+                difficulty = recipe.difficulty,
+                tags = recipe.tags,
+                authorId = recipe.authorId,
+                date = recipe.date,
+                rating = rating
+            )
+        }
+        call.respond(HttpStatusCode.OK, recipesDTO)
+    }
 }
+
+
 
 fun Route.recipeController() {
     val recipeUseCase: RecipeUseCasePort by inject()
