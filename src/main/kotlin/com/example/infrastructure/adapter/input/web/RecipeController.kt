@@ -181,7 +181,6 @@ fun Route.publicRecipeController() {
     }
 
     get("/search/ingredients"){
-        val recipeRequest = call.receive<SearchRecipesByList>()
         val limit = call.parameters["limit"]?.toIntOrNull()
             ?: 20
         val page = call.parameters["page"]?.toIntOrNull()
