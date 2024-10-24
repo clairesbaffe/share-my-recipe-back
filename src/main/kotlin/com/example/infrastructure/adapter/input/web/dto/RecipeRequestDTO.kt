@@ -21,9 +21,17 @@ data class RecipeRating(
 )
 
 data class SearchRecipes(
-    val search: String
+    val search: String?
 )
 
-data class SearchRecipesByIngredients(
-    val search: List<String>
+data class SearchRecipesByList(
+    val search: List<String>?
+)
+
+data class SearchRecipesByFilters(
+    val exclusions: List<String>?,
+    val difficulty: Int?,
+    val tags: List<String>?,
+    val nbPersons: List<Int>?,
+    val preparationTime: List<Int>?
 )

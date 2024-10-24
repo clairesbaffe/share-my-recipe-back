@@ -12,6 +12,9 @@ import com.example.infrastructure.mapper.UserMapper
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
@@ -243,6 +246,117 @@ class RecipeRepository : RecipeLoaderPort {
 
                     recipe to averageRating
                 }
+
+            }
+        }
+    }
+
+    fun parseTags(tagsString: String): List<String> {
+        return tagsString
+            .replace("[", "")
+            .replace("]", "")
+            .replace("'", "") // Enlever les apostrophes si nécessaire
+            .split(",")
+            .map { it.trim().lowercase() } // Convertir en minuscules et supprimer les espaces
+    }
+
+    override suspend fun getByFilters( order: String, sortBy: String, nbPersons: List<Int>, preparationTime: List<Int>, exclusions: List<String>, difficulty: Int, tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val offset = (page - 1) * limit
+                val gson = Gson()
+
+                var conditions: Op<Boolean> = (RecipeTable.difficulty lessEq difficulty)
+
+                if (nbPersons.size == 2) {
+                    conditions = conditions and (RecipeTable.nbPersons lessEq nbPersons[1]) and
+                            (RecipeTable.nbPersons greaterEq nbPersons[0])
+                }
+
+                if (preparationTime.size == 2) {
+                    conditions = conditions and (RecipeTable.preparationTime lessEq preparationTime[1]) and
+                            (RecipeTable.preparationTime greaterEq preparationTime[0])
+                }
+
+                val recipes = RecipeEntity.find {
+                    conditions
+                }.toList()
+
+                val filteredRecipes = recipes.filter { recipeEntity ->
+                    val recetteDetails: RecipeDetails = gson.fromJson(recipeEntity.recette, RecipeDetails::class.java)
+
+                    val ingredientsMatch = recetteDetails.ingredients.map { it.lowercase() }
+                        .none { it in exclusions.map { exclusion -> exclusion.lowercase() } }
+
+                    val tagsMatch = parseTags(recipeEntity.tags).map { it.lowercase().replace("\"", "") }
+                        .containsAll(tags.map { it.lowercase() })
+
+                    ingredientsMatch && tagsMatch
+                }
+
+                val filteredByListsRecipes = filteredRecipes.map { recipeEntity ->
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                    val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+                    val averageRating = if (ratings.isNotEmpty()) {
+                        ratings.map { it.rating }.average().toFloat()
+                    } else {
+                        0f
+                    }
+
+                    recipe to averageRating
+                }
+
+                val comparator = when (sortBy) {
+                    "ratings" -> compareBy<Pair<Recipe, Float>> { it.second }
+                    "dates" -> compareBy { it.first.date }
+                    "difficulty" -> compareBy { it.first.difficulty }
+                    else -> compareBy { it.second }
+                }
+
+                val sorted = if (order == "desc") {
+                    filteredByListsRecipes.sortedWith(comparator.reversed())
+                } else {
+                    filteredByListsRecipes.sortedWith(comparator)
+                }
+
+                sorted.drop(offset).take(limit)
+
+
+            }
+        }
+    }
+
+    override suspend fun getByTags(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return withContext(Dispatchers.IO) {
+            transaction {
+                val offset = (page - 1) * limit
+
+
+                val recipes = RecipeEntity.all().toList()
+
+                val filteredRecipes = recipes.filter { recipeEntity ->
+
+                    val tagsMatch = parseTags(recipeEntity.tags).map { it.lowercase().replace("\"", "") }
+                        .any { it in tags.map { tag -> tag.lowercase() } }
+
+                   tagsMatch
+                }
+
+                filteredRecipes.drop(offset).take(limit).map { recipeEntity ->
+                    val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                    val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+                    val averageRating = if (ratings.isNotEmpty()) {
+                        ratings.map { it.rating }.average().toFloat()
+                    } else {
+                        0f
+                    }
+
+                    recipe to averageRating
+                }
+
+
 
             }
         }
