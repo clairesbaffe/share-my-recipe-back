@@ -17,4 +17,5 @@ interface RecipeLoaderPort {
     suspend fun getByFilters(order: String, sortBy: String, nbPersons: List<Int>, preparationTime: List<Int>, exclusions: List<String>, difficulty: Int, tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>>
     suspend fun getByTagsAny(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>>
     suspend fun getByTagsAll(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>>
+    suspend fun getRecipeByIdByUserSession(recipeId: Long, userId: Long): Pair<Recipe, Float>?
 }

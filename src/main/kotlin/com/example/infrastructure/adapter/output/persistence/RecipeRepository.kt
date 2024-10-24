@@ -400,5 +400,37 @@ class RecipeRepository : RecipeLoaderPort {
         }
     }
 
+    override suspend fun getRecipeByIdByUserSession(recipeId: Long, userId: Long): Pair<Recipe, Float>? {
+        return withContext(Dispatchers.IO){
+            transaction {
+                // Trouver la recette par son ID
+                val recipeEntity = RecipeEntity.findById(recipeId)
+
+                // Si la recette n'existe pas, retourner null
+                if (recipeEntity == null) {
+                    return@transaction null
+                }
+
+                // Mapper l'entité recette vers le domaine
+                val recipe = RecipeMapper.toDomain(recipeEntity)
+
+                // Vérifier si l'userId correspond à l'authorId de la recette
+                if (recipe.authorId != userId) {
+                    return@transaction null // Retourne null si l'utilisateur n'est pas l'auteur
+                }
+
+                // Récupérer les notes pour la recette
+                val ratings = RecipeRatingsEntity.find { RecipeRatingsTable.recipeId eq recipe.id }.toList()
+                val averageRating = if (ratings.isNotEmpty()) {
+                    ratings.map { it.rating }.average().toFloat()
+                } else {
+                    0f
+                }
+
+                recipe to averageRating // Retourner la recette avec sa note
+            }
+        }
+    }
+
 
 }
