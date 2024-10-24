@@ -150,16 +150,13 @@ fun Route.publicRecipeController() {
         }
     }
 
-    get("/search"){
-        val recipeRequest = call.receive<SearchRecipes>()
-        val limit = call.parameters["limit"]?.toIntOrNull()
-            ?: 20
-        val page = call.parameters["page"]?.toIntOrNull()
-            ?: 1
+    get("/search") {
+        val query = call.parameters["query"] ?: ""
+        val limit = call.parameters["limit"]?.toIntOrNull() ?: 20
+        val page = call.parameters["page"]?.toIntOrNull() ?: 1
 
-        val search = recipeRequest.search?: ""
+        val searched = recipeUseCase.searchRecipeWithStr(query, page, limit)
 
-        val searched = recipeUseCase.searchRecipeWithStr(search, page, limit)
         val recipesDTO = searched.map { (recipe, rating) ->
             val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
@@ -178,6 +175,7 @@ fun Route.publicRecipeController() {
                 rating = rating
             )
         }
+
         call.respond(HttpStatusCode.OK, recipesDTO)
     }
 
