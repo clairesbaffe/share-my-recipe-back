@@ -88,8 +88,12 @@ class RecipeService(
         return recipeLoaderPort.getByFilters(order, sortBy, nbPersons, preparationTime, exclusions, difficulty, tags, page, limit)
     }
 
-    override suspend fun getByTags(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
-        return recipeLoaderPort.getByTags(tags, page, limit)
+    override suspend fun getByTagsAny(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return recipeLoaderPort.getByTagsAny(tags, page, limit)
+    }
+
+    override suspend fun getByTagsAll(tags: List<String>, page: Int, limit: Int): List<Pair<Recipe, Float>> {
+        return recipeLoaderPort.getByTagsAll(tags, page, limit)
     }
 
 

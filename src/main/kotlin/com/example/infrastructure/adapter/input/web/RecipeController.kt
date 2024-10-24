@@ -5,12 +5,14 @@ import com.example.infrastructure.adapter.input.web.dto.*
 import com.example.infrastructure.exception.RecipeNotFound
 import com.example.infrastructure.model.UserSession
 import com.google.gson.Gson
+import io.ktor.client.engine.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import org.jetbrains.exposed.sql.Op
 import org.koin.ktor.ext.inject
 import java.time.LocalDate
 
@@ -151,13 +153,12 @@ fun Route.publicRecipeController() {
     }
 
     get("/search"){
-        val recipeRequest = call.receive<SearchRecipes>()
         val limit = call.parameters["limit"]?.toIntOrNull()
             ?: 20
         val page = call.parameters["page"]?.toIntOrNull()
             ?: 1
 
-        val search = recipeRequest.search?: ""
+        val search = call.parameters["search"] ?: ""
 
         val searched = recipeUseCase.searchRecipeWithStr(search, page, limit)
         val recipesDTO = searched.map { (recipe, rating) ->
@@ -182,13 +183,11 @@ fun Route.publicRecipeController() {
     }
 
     get("/search/ingredients"){
-        val recipeRequest = call.receive<SearchRecipesByList>()
         val limit = call.parameters["limit"]?.toIntOrNull()
             ?: 20
         val page = call.parameters["page"]?.toIntOrNull()
             ?: 1
-
-        val ingredients = recipeRequest.search?: emptyList()
+        val ingredients = call.parameters["ingredients"]?.split(",")?.map { it.trim() } ?: emptyList()
         val searched = recipeUseCase.getByIngredients(ingredients, page, limit)
         val recipesDTO = searched.map { (recipe, rating) ->
             val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
@@ -212,7 +211,6 @@ fun Route.publicRecipeController() {
     }
 
     get("/search/filters"){
-        val recipeRequest = call.receive<SearchRecipesByFilters>()
         val limit = call.parameters["limit"]?.toIntOrNull()
             ?: 20
         val page = call.parameters["page"]?.toIntOrNull()
@@ -221,11 +219,14 @@ fun Route.publicRecipeController() {
             ?: "desc"
         val sortBy = call.parameters["sortBy"]
             ?: "ratings"
-        val exclusions = recipeRequest.exclusions ?: emptyList()
-        val difficulty = recipeRequest.difficulty ?: 5
-        val tags = recipeRequest.tags ?: emptyList()
-        val nbPersons = recipeRequest.nbPersons ?: emptyList()
-        val preparationTime = recipeRequest.preparationTime ?: emptyList()
+        val exclusions = call.parameters["exclusions"]?.split(",")?.map { it.trim() }
+            ?: emptyList()
+        val difficulty = call.parameters["difficulty"]?.toIntOrNull() ?: 5
+        val tags = call.parameters["tags"]?.split(",")?.map { it.trim() } ?: emptyList()
+        val nbPersons = call.parameters["nbPersons"]?.split(",")?.mapNotNull { it.toIntOrNull() } ?: emptyList()
+        val preparationTime = call.parameters["preparationTime"]?.split(",")?.mapNotNull { it.toIntOrNull() }?: emptyList()
+        println("Exclusions: $exclusions, Difficulty: $difficulty, Tags: $tags, NbPersons: $nbPersons, PreparationTime: $preparationTime")
+
 
         val searched = recipeUseCase.getByFilters(order, sortBy, nbPersons, preparationTime, exclusions, difficulty, tags, page, limit)
         val recipesDTO = searched.map { (recipe, rating) ->
@@ -250,32 +251,42 @@ fun Route.publicRecipeController() {
     }
 
     get("/search/tags"){
-        val recipeRequest = call.receive<SearchRecipesByFilters>()
-        val limit = call.parameters["limit"]?.toIntOrNull()
-            ?: 20
-        val page = call.parameters["page"]?.toIntOrNull()
-            ?: 1
-        val tags = recipeRequest.tags?: emptyList()
-        val searched = recipeUseCase.getByTags(tags, page, limit)
-        val recipesDTO = searched.map { (recipe, rating) ->
-            val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
+        try{
+            val limit = call.parameters["limit"]?.toIntOrNull()
+                ?: 20
+            val page = call.parameters["page"]?.toIntOrNull()
+                ?: 1
+            val any = call.parameters["any"]?.toBooleanStrictOrNull()
+                ?: true
+            val tags = call.parameters["tags"]?.split(",")?.map { it.trim() } ?: emptyList()
+            val searched = if(any){
+                recipeUseCase.getByTagsAny(tags, page, limit)
+            } else{
+                recipeUseCase.getByTagsAll(tags, page, limit)
+            }
+            val recipesDTO = searched.map { (recipe, rating) ->
+                val recetteDetails: RecipeDetails = gson.fromJson(recipe.recette, RecipeDetails::class.java)
 
-            RecipeWithRatingResponseDTO(
-                id = recipe.id,
-                title = recipe.title,
-                image = recipe.image,
-                description = recipe.description,
-                recette = recetteDetails,
-                preparationTime = recipe.preparationTime,
-                nbPersons = recipe.nbPersons,
-                difficulty = recipe.difficulty,
-                tags = recipe.tags,
-                authorId = recipe.authorId,
-                date = recipe.date,
-                rating = rating
-            )
+                RecipeWithRatingResponseDTO(
+                    id = recipe.id,
+                    title = recipe.title,
+                    image = recipe.image,
+                    description = recipe.description,
+                    recette = recetteDetails,
+                    preparationTime = recipe.preparationTime,
+                    nbPersons = recipe.nbPersons,
+                    difficulty = recipe.difficulty,
+                    tags = recipe.tags,
+                    authorId = recipe.authorId,
+                    date = recipe.date,
+                    rating = rating
+                )
+            }
+            call.respond(HttpStatusCode.OK, recipesDTO)
+        } catch (e: Exception){
+            call.respond(HttpStatusCode.BadRequest, "une erreur est survenue")
         }
-        call.respond(HttpStatusCode.OK, recipesDTO)
+
     }
 
 }

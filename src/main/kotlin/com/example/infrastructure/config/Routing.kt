@@ -17,6 +17,9 @@ fun Application.configureRouting() {
             route("/public/recipes") {
                 publicRecipeController()
             }
+            route("/public/users"){
+                publicUserController()
+            }
 
             withSessionRenewal {
                 route("/recipes") {
