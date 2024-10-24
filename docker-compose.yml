@@ -9,6 +9,8 @@ services:
       DB_URL: "jdbc:postgresql://db:5432/librarydb"
       DB_USER: "postgres"
       DB_PASSWORD: "password"
+      SESSION_SECRET: "superSecretKeyThatShouldBeLongAndSecure12345!"
+      PORT: 8080
 
   db:
     image: postgres:13
