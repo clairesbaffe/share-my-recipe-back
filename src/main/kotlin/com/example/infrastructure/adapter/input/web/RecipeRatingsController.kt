@@ -124,7 +124,7 @@ fun Route.recipeRatingsController() {
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: throw IllegalArgumentException("ID utilisateur invalide ou manquant")
 
-            recipeRatingUseCase.deleteRating(recipeId, userId)
+            recipeRatingUseCase.deleteRating(userId, recipeId)
             call.respond(HttpStatusCode.Created, mapOf("message" to "La note $recipeId a bien été supprimée"))
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest, e.message ?: "Erreur lors de la suppression de note")
