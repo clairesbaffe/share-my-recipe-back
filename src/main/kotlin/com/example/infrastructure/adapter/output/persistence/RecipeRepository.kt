@@ -231,13 +231,18 @@ class RecipeRepository : RecipeLoaderPort {
 
                 val recipes = RecipeEntity.all().toList()
 
+                val normalizedIngredients = ingredients.map { it.lowercase().trim() }
+
                 val filteredRecipes = recipes.filter { recipeEntity ->
                     val recetteDetails: RecipeDetails = gson.fromJson(recipeEntity.recette, RecipeDetails::class.java)
 
-                    val ingredientsMatch = recetteDetails.ingredients.map { it.lowercase() }
-                        .containsAll(ingredients.map { it.lowercase() })
+                    val recetteIngredients = recetteDetails.ingredients.map { it.lowercase().trim() }
 
-                    ingredientsMatch
+                    normalizedIngredients.all { reqIngredient ->
+                        recetteIngredients.any { recetteIngredient ->
+                            recetteIngredient.contains(reqIngredient)
+                        }
+                    }
                 }
 
                 filteredRecipes.drop(offset).take(limit).map { recipeEntity ->
@@ -252,10 +257,10 @@ class RecipeRepository : RecipeLoaderPort {
 
                     recipe to averageRating
                 }
-
             }
         }
     }
+
 
     fun parseTags(tagsString: String): List<String> {
         return tagsString
@@ -304,7 +309,7 @@ class RecipeRepository : RecipeLoaderPort {
                     val ingredientsMatch = recetteDetails.ingredients.map { it.lowercase() }
                         .none { it in exclusions.map { exclusion -> exclusion.lowercase() } }
 
-                    val tagsMatch = parseTags(recipeEntity.tags).map { it.lowercase().replace("\"", "") }
+                    val tagsMatch = (recipeEntity.tags).map { it.lowercase().replace("\"", "") }
                         .containsAll(tags.map { it.lowercase() })
 
                     ingredientsMatch && tagsMatch
