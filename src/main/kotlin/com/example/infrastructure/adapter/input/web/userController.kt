@@ -35,22 +35,4 @@ fun Route.publicUserController() {
         }
     }
 
-    get("") {
-        try {
-            val userSession = call.sessions.get<UserSession>()
-                ?: throw IllegalArgumentException("User not logged in or session expired")
-            val user = userUseCase.findById(userSession.userId)
-                ?: throw IllegalArgumentException("utilisateur introuvable")
-
-            val userResponseDTO = UserResponseDTO(
-                id = user.id,
-                username = user.username,
-                creationDate = user.date
-            )
-
-            call.respond(HttpStatusCode.OK, userResponseDTO)
-        } catch (e: IllegalArgumentException) {
-            call.respond(HttpStatusCode.Conflict, e.message ?: "Erreur lors de l'inscription")
-        }
-    }
 }
